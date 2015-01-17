@@ -13,13 +13,12 @@ module.exports = function(grunt) {
         jshint: {
             files: ['Gruntfile.js', 'js/*.js'],
             options: {
-                globals: {
-                    node: true
-                },
                 forin: true,
                 funcscope: true,
                 newcap: true,
+                node: true,
                 quotmark: 'single',
+                undef: true,
                 unused: true
           }
         },

@@ -1,4 +1,4 @@
-/*jshint node:true */
+/*jshint node:true, browser: true */
 
 // var Util = require('./util.js');
 var CPU6502 = require('./cpu6502.js');

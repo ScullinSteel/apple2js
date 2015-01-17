@@ -1,3 +1,4 @@
+/*jshint browser: true */
 // var ROM = require('./roms/apple2plus.js');
 var ROM = require('./roms/apple2e.js');
 var AppleII = require('./apple2.js');

@@ -116,7 +116,7 @@ function LoresPage(page)
     return {
         start: function() { 
             var self = this;
-            window.setInterval(function() {
+            setInterval(function() {
                 self.blink();
             }, 267);
             return (0x04 * _page); 

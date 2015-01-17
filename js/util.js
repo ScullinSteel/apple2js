@@ -78,21 +78,21 @@ function toBinary(v) {
 }
 
 // From http://www.netlobo.com/url_query_string_javascript.html
-function gup( name )
+function gup( url, name )
 {
   name = name.replace(/[\[]/,'\\[').replace(/[\]]/,'\\]');
   var regexS = '[\\?&]'+name+'=([^&#]*)';
   var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
+  var results = regex.exec( url );
   if( !results )
     return '';
   else
     return results[1];
 }
 
-function hup() {
+function hup( url ) {
     var regex = new RegExp('#(.*)');
-    var results = regex.exec(window.location.hash);
+    var results = regex.exec(url);
     if ( !results )
         return '';
     else

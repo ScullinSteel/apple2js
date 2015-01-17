@@ -16,6 +16,8 @@ var Base64 = require('./base64.js');
 var allocMem = Util.allocMem;
 var base64_encode = Base64.encode;
 var base64_decode = Base64.decode;
+var bytify = Base64.bytify;
+var each = Base64.each;
 
 function RAMFactor(mmu, io, slot, size) {
     var rom = [
