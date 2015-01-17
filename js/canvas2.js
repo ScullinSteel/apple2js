@@ -1,5 +1,5 @@
 /* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2014 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -10,11 +10,13 @@
  * implied warranty.
  */
 
-/*jshint browser:true */
-/*globals allocMemPages: false, 
-          charset: false, 
-          base64_encode: false, base64_decode: false */
-/*exported LoresPage, HiresPage, VideoModes*/
+var Util = require('./util.js');
+var charset = require('./charroms/apple2lc.js').charset;
+var Base64 = require('./base64.js');
+
+var allocMemPages = Util.allocMemPages;
+var base64_decode = Base64.decode;
+var base64_encode = Base64.encode;
 
 /*
  * Text Page 1 Drawing
@@ -159,7 +161,7 @@ function LoresPage(page)
                         back = _greenMode ? _green : _white;
                     }
                     for (jdx = 0; jdx < 8; jdx++) {
-                        b = charset[(val & 0x3f) * 8 + jdx];
+                        b = charset[val * 8 + jdx];
                         b <<= 1;
                         for (idx = 0; idx < 7; idx++) {
                             color = (b & 0x80) ? fore : back;
@@ -177,7 +179,7 @@ function LoresPage(page)
                             b = (jdx < 4) ? (val & 0x0f) : (val >> 4);
                             b |= (b << 4);
                             b |= (b << 8);
-                            if (col & 0x1) {
+                            if ((col & 0x1) !== 0) {
                                 b <<= 2;
                             }
                             for (idx = 0; idx < 14; idx++) {
@@ -332,7 +334,7 @@ function HiresPage(page)
                 b2 = col < 39 ? _buffer[base + 1] : 0;
                 val |= (b2 & 0x3) << 7;
                 var v0 = b0 & 0x20, v1 = b0 & 0x40, v2 = val & 0x1,
-                odd = !(col & 0x1), 
+                odd = (col & 0x1) === 0,
                 color, 
                 oddCol = (hbs ? orangeCol : greenCol),
                 evenCol = (hbs ? blueCol : violetCol);
@@ -491,3 +493,8 @@ function VideoModes(gr,hgr,gr2,hgr2) {
     };
 }
 
+module.exports = {
+    LoresPage: LoresPage,
+    HiresPage: HiresPage,
+    VideoModes: VideoModes
+};

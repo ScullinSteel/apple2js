@@ -10,15 +10,21 @@
  * implied warranty.
  */
 
-/*globals debug: false, toHex: false, each: false */
-/*exported Apple2IO */
+var Util = require('./util');
+var events = require('events');
+
+var debug = Util.debug;
+var each = Util.each;
+var toHex = Util.toHex;
 
 function Apple2IO(cpu, callbacks)
 {
-    "use strict";
+    'use strict';
+    var emitter = new events.EventEmitter();
 
     var _hz = 1023000;
-    var _rate = 16000;
+    var _rate = 44000;
+    var _sample_size = 4096;
 
     var _cycles_per_sample = _hz / _rate;
 
@@ -31,9 +37,8 @@ function Apple2IO(cpu, callbacks)
     var _sample = [];
     var _sampleTime = 0;
 
-    var _high = "%A0";
-    var _mid = "%80";
-    var _low = "%60";
+    var _high = 0.5;
+    var _low = -0.5;
 
     var _trigger = 0;
 
@@ -93,6 +98,18 @@ function Apple2IO(cpu, callbacks)
     }
 
     var _locs = [];
+
+    function _tick() {
+        var now = cpu.cycles();
+        var phase = _phase > 0 ? _high : _low;
+        for (; _sampleTime < now; _sampleTime += _cycles_per_sample) {
+            _sample.push(phase);
+            if (_sample.length >= _sample_size) {
+                emitter.emit('available', _sample);
+                _sample = [];
+            }
+        }
+    }
 
     function _access(off) {
         var result = 0;
@@ -204,13 +221,8 @@ function Apple2IO(cpu, callbacks)
             if ('doublehires' in callbacks) callbacks.doublehires(true);
             break;
         case LOC.SPEAKER:
-            if (_sampleTime) {
-                var phase = _phase > 0 ? _high : _low;
-                for (; _sampleTime < now; _sampleTime += _cycles_per_sample) {
-                    _sample.push(phase);
-                }
-                _phase = -_phase;
-            }
+            _phase = -_phase;
+            _tick();
             break;
         case LOC.STROBE:
             _key &= 0x7f;
@@ -296,13 +308,16 @@ function Apple2IO(cpu, callbacks)
                 _locs[val] = a;
             });
         },
+
         start: function apple2io_start() {
             this.registerSwitches(this, LOC);
             return 0xc0;
         },
+
         end: function apple2io_end() {
             return 0xc0;
         },
+
         read: function apple2io_read(page, off) { 
             var result = 0;
             if (_locs[off]) {
@@ -312,6 +327,7 @@ function Apple2IO(cpu, callbacks)
             }
             return result;
         },
+
         write: function apple2io_write(page, off, val) {
             if (_locs[off]) {
                 _locs[off].ioSwitch(off, val);
@@ -319,15 +335,23 @@ function Apple2IO(cpu, callbacks)
                 debug("I/O write: C0" + toHex(off));
             }
         },
-        getState: function apple2io_getState() { return {}; },
-        setState: function apple2io_setState() { },
+
+        getState: function apple2io_getState() {
+            return {};
+        },
+
+        setState: function apple2io_setState() {
+        },
+
         ioSwitch: function apple2io_ioSwitch(off, val) {
             return _access(off, val);
         },
+
         keyDown: function apple2io_keyDown(ascii) {
             _keyDown = true;
             _key = ascii | 0x80;
         },
+
         keyUp: function apple2io_keyUp() { 
             _keyDown = false;
             _key = 0;
@@ -336,51 +360,23 @@ function Apple2IO(cpu, callbacks)
         buttonDown: function apple2io_buttonDown(b) {
             _button[b] = true;
         },
+
         buttonUp: function apple2io_buttonUp(b) {
             _button[b] = false;
         },
+        
         paddle: function apple2io_paddle(p, v) {
             _paddle[p] = v;
         },
-        getSample: function apple2io_getSample() {
-            var result = _sample;
-            var now = cpu.cycles();
-
-            var phase = _mid;
-            if (_sample.length) {
-                phase = _phase > 0 ? _high : _low;
-            }
-            for (; _sampleTime < now; _sampleTime += _cycles_per_sample) {
-                _sample.push(phase);
-            }
-
-            _sample = [];
-
-            return result;
-        },
-        floatAudio: function apple2io_floatAudio(rate) {
-            _rate = rate;
-            _low = -0.5;
-            _mid = 0.0;
-            _high = 0.5;
-
-            _cycles_per_sample = _hz / _rate;
-        },
-        byteAudio: function apple2io_byteAudio(rate) {
-            _rate = rate;
-            _low = 0xa0;
-            _mid = 0x80;
-            _high = 0x60;
-
-            _cycles_per_sample = _hz / _rate;
-        },
+        
         updateHz: function apple2io_updateHz(hz) {
             _hz = hz;
             
             _cycles_per_sample = _hz / _rate;
         },
+
         setKeyBuffer: function apple2io_setKeyBuffer(buffer) {
-            _buffer = buffer.split("");
+            _buffer = buffer.split('');
             if (_buffer.length > 0) {
                 _keyDown = true;
                 _key = _buffer.shift().charCodeAt(0) | 0x80;
@@ -391,6 +387,21 @@ function Apple2IO(cpu, callbacks)
             debug('Tape length: ' + tape.length);
             _tape = tape;
             _tapeOffset = -1;
+        },
+
+        sampleRate: function sampleRate(rate) { 
+            _rate = rate;
+            _cycles_per_sample = _hz / _rate;
+        },
+        
+        sampleTick: function sampleTick() {
+            _tick();
+        },
+        
+        addSampleListener: function addSampleListener(cb) {
+            emitter.on('available', cb);
         }
     };
 }
+
+module.exports = Apple2IO;

@@ -10,9 +10,15 @@
  * implied warranty.
  */
 
-/*globals RAM: false, toHex: false, hiresMode: false, debug: false */
-/*exported MMU */
-function MMU(cpu, lores1, lores2, hires1, hires2, io, rom)
+/*jshint node:true */
+
+var Util = require('./util.js');
+var RAM = require('./ram.js');
+
+var debug = Util.debug;
+var toHex = Util.toHex;
+
+function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
 {
     var idx;
 
@@ -263,7 +269,7 @@ function MMU(cpu, lores1, lores2, hires1, hires2, io, rom)
                     _readPages[idx] = _pages[idx][1];
                     _writePages[idx] = _pages[idx][1];
                 }
-                if (hiresMode) {
+                if (vm.isHires()) {
                     for (idx = 0x20; idx < 0x40; idx++) {
                         _readPages[idx] = _pages[idx][1];
                         _writePages[idx] = _pages[idx][1];
@@ -274,7 +280,7 @@ function MMU(cpu, lores1, lores2, hires1, hires2, io, rom)
                     _readPages[idx] = _pages[idx][0];
                     _writePages[idx] = _pages[idx][0];
                 }
-                if (hiresMode) {
+                if (vm.isHires()) {
                     for (idx = 0x20; idx < 0x40; idx++) {
                         _readPages[idx] = _pages[idx][0];
                         _writePages[idx] = _pages[idx][0];
@@ -680,3 +686,5 @@ function MMU(cpu, lores1, lores2, hires1, hires2, io, rom)
         }
     };
 }
+
+module.exports = MMU;

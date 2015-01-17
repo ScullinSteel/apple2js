@@ -1,5 +1,3 @@
-/*exported base64_encode, base64_decode */
-
 function base64_encode (data) {
     // Twacked by Will Scullin to handle arrays of "bytes"
     
@@ -110,3 +108,8 @@ function base64_decode(data) {
 
     return tmp_arr;
 }
+
+module.exports = {
+    decode: base64_decode,
+    encode: base64_encode
+};

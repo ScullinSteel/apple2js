@@ -10,8 +10,12 @@
  * implied warranty.
  */
 
-/*globals allocMemPages, base64_encode, base64_decode */
-/*exported RAM */
+var Util = require('./util.js');
+var Base64 = require('./base64.js');
+
+var allocMemPages = Util.allocMemPages;
+var base64_encode = Base64.encode;
+var base64_decode = Base64.decode;
 
 function RAM(sp, ep) {
     var mem;
@@ -55,3 +59,5 @@ function RAM(sp, ep) {
         }
     };
 }
+
+module.exports = RAM;

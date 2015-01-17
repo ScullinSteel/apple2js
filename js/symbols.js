@@ -511,7 +511,7 @@ var SYMBOLS = {
     0xE8DA: "SHIFT.RIGHT.1",
     0xE8DC: "SHIFT.RIGHT.2",
     0xE8F0: "SHIFT.RIGHT",
-    0xE8FD: "L",
+//    0xE8FD: "L",
     0xE8FD: "SHIFT.RIGHT.3",
     0xE907: "SHIFT.RIGHT.4",
     0xE911: "SHIFT.RIGHT.5",
@@ -600,7 +600,7 @@ var SYMBOLS = {
     0xEE5F: "FOUT.6",
     0xEE64: "CON.HALF",
     0xEE69: "DECTBL",
-    0xEE8D: "DECTBL.END",
+//    0xEE8D: "DECTBL.END",
     0xEE8D: "SQR",
     0xEE97: "FPWRT",
     0xEED0: "NEGOP",
@@ -631,7 +631,7 @@ var SYMBOLS = {
     0xF0CE: "POLY.ATN",
     0xF10B: "GENERIC.CHRGET",
     0xF128: "COLD.START",
-    0xF128: "GENERIC.END",
+//    0xF128: "GENERIC.END",
     0xF1D5: "CALL",
     0xF1DE: "IN.NUMBER",
     0xF1E5: "PR.NUMBER",
@@ -738,3 +738,5 @@ var SYMBOLS = {
     0xFEFD: "MON.READ",
     0xFF02: "MON.READ2"
 };
+
+module.exports = SYMBOLS;

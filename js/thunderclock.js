@@ -1,5 +1,5 @@
 /* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2013 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -340,7 +340,7 @@ function Thunderclock(mmu, io, slot)
         switch (off) {
         case LOC.CONTROL:
             if (val !== undefined) {
-                if (val & FLAGS.STROBE) {
+                if ((val & FLAGS.STROBE) !== 0) {
                     if ((_command & 0x78) == 0x18) {
                         _calcbits();
                     }

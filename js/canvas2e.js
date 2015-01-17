@@ -10,11 +10,15 @@
  * implied warranty.
  */
 
-/*jshint browser:true */
-/*globals allocMemPages: false, charset: false, base64_encode: false, base64_decode: false, enhanced: false */
-/*exported LoresPage, HiresPage, VideoModes */
+var Util = require('./util.js');
+var charset = require('./charroms/apple2echar.js').charset;
+var Base64 = require('./base64.js');
 
+var allocMemPages = Util.allocMemPages;
+var base64_decode = Base64.decode;
+var base64_encode = Base64.encode;
 
+var enhanced = true;
 var textMode = true;
 var mixedMode = false;
 var hiresMode = false;
@@ -116,10 +120,11 @@ function LoresPage(page)
     return {
         start: function() {
             var self = this;
-            window.setInterval(function() {
+            setInterval(function() {
                 self.blink();
             }, 267);
         },
+
         bank0: function() {
             var self = this;
             return {
@@ -836,4 +841,8 @@ function VideoModes(gr,hgr,gr2,hgr2) {
     };
 }
 
-
+module.exports = {
+    LoresPage: LoresPage,
+    HiresPage: HiresPage,
+    VideoModes: VideoModes
+};

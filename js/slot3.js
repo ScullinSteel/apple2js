@@ -10,7 +10,7 @@
  * implied warranty.
  */
 
-/*exported Slot3*/
+/*jshint node:true */
 
 function Slot3(mmu, rom)
 {
@@ -42,5 +42,6 @@ function Slot3(mmu, rom)
             mmu.auxRom(0x3, auxRomFn);
         }
     };
-
 }
+
+module.exports = Slot3;

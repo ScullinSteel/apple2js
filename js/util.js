@@ -10,8 +10,9 @@
  * implied warranty.
  */
 
-/*jshint rhino:true, browser: true, devel: true */
-/*exported allocMem, allocMemPages, bytify, debug, toHex, toBinary, extend, gup, hup, each */
+/*jshint node: true */
+
+var console = require('console');
 
 if (!Date.now) {
     Date.now = function now() {
@@ -24,7 +25,7 @@ var bin_digits = "01";
 
 function allocMem(size) {
     var result;
-    if (window.Uint8Array) {
+    if (typeof Uint8Array !== 'undefined') {
         result = new Uint8Array(size);
     } else {
         result = new Array(size);
@@ -38,7 +39,7 @@ function allocMemPages(pages) {
 
 function bytify(ary) {
     var result = ary;
-    if (window.Uint8Array) {
+    if (typeof Uint8Array !== 'undefined') {
         result = new Uint8Array(ary);
     }
     return result;
@@ -52,11 +53,7 @@ function extend(ary1, ary2) {
 }
 
 function debug(msg) {
-    if (typeof(console) != 'undefined' && 'log' in console) {
-        console.log(msg);
-    } else if (typeof(environment) == 'object') { // rhino shell
-        print(msg);
-    }
+    console.log(msg);
 }
 
 function toHex(v, n) {
@@ -115,3 +112,15 @@ function keys(obj) {
 function each(obj, fn) {
     keys(obj).forEach(fn);
 }
+
+module.exports = {
+    allocMemPages: allocMemPages,
+    bytify: bytify,
+    extend: extend,
+    debug: debug,
+    toBinary: toBinary,
+    toHex: toHex,
+    gup: gup,
+    hup: hup,
+    each: each
+};

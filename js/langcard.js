@@ -10,8 +10,8 @@
  * implied warranty.
  */
 
-/*globals RAM */
-/*exported LanguageCard */
+/*jshint node:true */
+var RAM = require('./ram.js');
 
 function LanguageCard(io, rom) {
     var _io = io;
@@ -220,3 +220,5 @@ function LanguageCard(io, rom) {
         }
     };
 }
+
+module.exports = LanguageCard;

@@ -11,8 +11,9 @@
  * implied warranty.
  */
 
-/*globals toHex: false, debug: false*/
-/*exported CPU6502 */
+var Util = require('./util.js');
+var debug = Util.debug;
+var toHex = Util.toHex;
 
 function CPU6502(options)
 {
@@ -116,7 +117,7 @@ function CPU6502(options)
 
     function testNZ(val) {
         sr = val === 0 ? (sr | flags.Z) : (sr & ~flags.Z);
-        sr = val & 0x80 ? (sr | flags.N) : (sr & ~flags.N);
+        sr = (val & 0x80) ? (sr | flags.N) : (sr & ~flags.N);
 
         return val;
     }
@@ -133,7 +134,7 @@ function CPU6502(options)
   
         // KEGS
         var c, v;
-        if (sr & flags.D) {
+        if ((sr & flags.D) !== 0) {
             c = (a & 0x0f) + (b & 0x0f) + (sr & flags.C);
             if (sub) {
                 if (c < 0x10)
@@ -155,8 +156,9 @@ function CPU6502(options)
             v = (c ^ a) & 0x80;
         }
 
-        if ((a ^ b) & 0x80)
+        if (((a ^ b) & 0x80) !== 0) {
             v = 0;
+        }
 
         setFlag(flags.C, c > 0xff);
         setFlag(flags.V, v);
@@ -223,8 +225,7 @@ function CPU6502(options)
 
     function pullByte() {
         sp = (sp + 0x01) & 0xff;
-        var result = readByte(loc.STACK | sp);
-        return result;
+        return readByte(loc.STACK | sp);
     }
 
     function pullWord() {
@@ -592,7 +593,7 @@ function CPU6502(options)
     /* Bit */
     function bit(readFn) {
         var val = readFn();
-        setFlag(flags.Z, !(val & ar));
+        setFlag(flags.Z, (val & ar) === 0);
         setFlag(flags.N, val & 0x80);
         setFlag(flags.V, val & 0x40);
     }
@@ -600,7 +601,7 @@ function CPU6502(options)
     /* Bit Immediate*/
     function bitI(readFn) {
         var val = readFn();
-        setFlag(flags.Z, !(val & ar));
+        setFlag(flags.Z, (val & ar) === 0);
     }
 
     function compare(a, b) 
@@ -626,7 +627,7 @@ function CPU6502(options)
     /* Branches */
     function brs(f) {
         var off = readBytePC(); // changes pc
-        if (f & sr) {
+        if ((f & sr) !== 0) {
             var oldPC = pc;
             pc += off > 127 ? off - 256 : off;
             cycles++;
@@ -636,7 +637,7 @@ function CPU6502(options)
 
     function brc(f) {
         var off = readBytePC(); // changes pc
-        if (!(f & sr)) {
+        if ((f & sr) === 0) {
             var oldPC = pc;
             pc += off > 127 ? off - 256 : off;
             cycles++;
@@ -1036,10 +1037,12 @@ function CPU6502(options)
 
     if (is65C02) {
         for (var key in cops) {
-            if (key in ops) {
-                debug('overriding opcode ' + toHex(key));
+            if (cops.hasOwnProperty(key)) {
+                if (key in ops) {
+                    debug('overriding opcode ' + toHex(key));
+                }
+                ops[key] = cops[key];
             }
-            ops[key] = cops[key];
         }
     }
 
@@ -1179,8 +1182,9 @@ function CPU6502(options)
         {
             var op, end = cycles + c;
 
-            if (inCallback)
+            if (inCallback) {
                 return;
+            }
 
             while (cycles < end) {
                 sync = true;
@@ -1226,7 +1230,7 @@ function CPU6502(options)
         /* IRQ - Interupt Request */
         irq: function cpu_irq()
         {
-            if (!(sr & flags.I)) {
+            if ((sr & flags.I) === 0) {
                 pushWord(pc);
                 pushByte(sr & ~flags.B);
                 if (is65C02) {
@@ -1373,14 +1377,14 @@ function CPU6502(options)
                 " P=" + toHex(sr) +
                 " S=" + toHex(sp) +
                 " " +
-                (sr & flags.N ? "N" : "-") + 
-                (sr & flags.V ? "V" : "-") + 
+                ((sr & flags.N) ? "N" : "-") +
+                ((sr & flags.V) ? "V" : "-") +
                 "-" + 
-                (sr & flags.B ? "B" : "-") + 
-                (sr & flags.D ? "D" : "-") + 
-                (sr & flags.I ? "I" : "-") + 
-                (sr & flags.Z ? "Z" : "-") + 
-                (sr & flags.C ? "C" : "-");
+                ((sr & flags.B) ? "B" : "-") +
+                ((sr & flags.D) ? "D" : "-") +
+                ((sr & flags.I) ? "I" : "-") +
+                ((sr & flags.Z) ? "Z" : "-") +
+                ((sr & flags.C) ? "C" : "-");
         },
 
         read: function(page, off) {
@@ -1392,4 +1396,5 @@ function CPU6502(options)
         }
     };
 }
-    
+
+module.exports = CPU6502;         

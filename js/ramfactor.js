@@ -10,8 +10,12 @@
  * implied warranty.
  */
 
-/*globals allocMem:false, bytify, base64_encode, base64_decode, each: false */
-/*exported RAMFactor*/
+var Util = require('./util.js');
+var Base64 = require('./base64.js');
+
+var allocMem = Util.allocMem;
+var base64_encode = Base64.encode;
+var base64_decode = Base64.decode;
 
 function RAMFactor(mmu, io, slot, size) {
     var rom = [
@@ -1079,14 +1083,14 @@ function RAMFactor(mmu, io, slot, size) {
     }
 
     function _setmid(val) {
-        if ((_rammid & 0x80) && !(val & 0x80)) {
+        if (((_rammid & 0x80) !== 0) && ((val & 0x80) === 0)) {
             _sethi(_ramhi + 1);
         }
         _rammid = (val & 0xff);
     }
 
     function _setlo(val) {
-        if ((_ramlo & 0x80) && !(val & 0x80)) {
+        if (((_ramlo & 0x80) !== 0) && ((val & 0x80) === 0)) {
             _setmid(_rammid + 1);
         }
         _ramlo = (val & 0xff);
@@ -1208,3 +1212,5 @@ function RAMFactor(mmu, io, slot, size) {
         }
     };
 }
+
+module.exports = RAMFactor;

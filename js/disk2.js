@@ -1,5 +1,5 @@
 /* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2013 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2014 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -10,13 +10,22 @@
  * implied warranty.
  */
 
-/*jshint browser: true */
-/*globals extend: false, bytify: false, base64_encode: false, base64_decode: false, each: false */
-/*exported DiskII */
+var Util = require('./util.js');
+var Base64 = require('./base64.js');
+var events = require('events');
 
-function DiskII(io, callbacks, slot)
+var bytify = Util.bytify;
+//var debug = Util.debug;
+var each = Util.each;
+var extend = Util.extend;
+//var toHex = Util.toHex;
+
+var base64_decode = Base64.decode;
+var base64_encode = Base64.encode;
+
+function DiskII(io, slot)
 {
-    "use strict";
+    'use strict';
 
     slot = slot || 6;
     var _drives = [
@@ -47,7 +56,8 @@ function DiskII(io, callbacks, slot)
     var _on = false;
     var _drive = 1;
     var _cur = _drives[_drive - 1];
-
+    var _emitter = new events.EventEmitter();
+    
     var LOC = {
         // Disk II Stuff
         PHASE0OFF: 0x80,
@@ -357,11 +367,15 @@ function DiskII(io, callbacks, slot)
                     }
                     for (kdx = 0, jdx = 0x55; kdx < 0x100; kdx++) {
                         data[kdx] <<= 1;
-                        if (data2[jdx] & 0x01) data[kdx] |= 0x01;
+                        if ((data2[jdx] & 0x01) !== 0) {
+                            data[kdx] |= 0x01;
+                        }
                         data2[jdx] >>= 1;
 
                         data[kdx] <<= 1;
-                        if (data2[jdx] & 0x01) data[kdx] |= 0x01;
+                        if ((data2[jdx] & 0x01) !== 0) {
+                            data[kdx] |= 0x01;
+                        }
                         data2[jdx] >>= 1;
 
                         if (--jdx < 0) jdx = 0x55;
@@ -433,30 +447,30 @@ function DiskII(io, callbacks, slot)
         case LOC.DRIVEOFF:
             _debug("Drive Off");
             _on = false;
-            if (callbacks.driveLight) { callbacks.driveLight(_drive, false); }
+            _emitter.emit('driveLight', _drive, _on);
             break;
         case LOC.DRIVEON:
             _debug("Drive On");
             _on = true;
-            if (callbacks.driveLight) { callbacks.driveLight(_drive, true); }
+            _emitter.emit('driveLight', _drive, _on);
             break;
             
         case LOC.DRIVE1:
             _debug("Disk 1");
             _drive = 1;
             _cur = _drives[_drive - 1];
-            if (_on && callbacks.driveLight) {
-                callbacks.driveLight(2, false);
-                callbacks.driveLight(1, true);
+            if (_on) {
+                _emitter.emit('driveLight', 1, true);
+                _emitter.emit('driveLight', 2, false);
             }
             break;
         case LOC.DRIVE2:
             _debug("Disk 2");
             _drive = 2;
             _cur = _drives[_drive - 1];
-            if (_on && callbacks.driveLight)  {
-                callbacks.driveLight(1, false);
-                callbacks.driveLight(2, true);
+            if (_on)  {
+                _emitter.emit('driveLight', 1, false);
+                _emitter.emit('driveLight', 2, true);
             }
             break;
             
@@ -488,10 +502,10 @@ function DiskII(io, callbacks, slot)
 
     function _updateDirty(drive, dirty) {
         _drives[drive - 1].dirty = dirty;
-        if (callbacks.dirty) { callbacks.dirty(_drive, dirty); }
+        _emitter.emit('dirty', drive, dirty);
     }
 
-    var diskII_16 = [
+    var diskII = [
         0xa2,0x20,0xa0,0x00,0xa2,0x03,0x86,0x3c,
         0x8a,0x0a,0x24,0x3c,0xf0,0x10,0x05,0x3c,
         0x49,0xff,0x29,0x7e,0xb0,0x08,0x4a,0xd0,
@@ -560,7 +574,6 @@ function DiskII(io, callbacks, slot)
         0x03,0x4c,0x01,0x03,0x4c,0x2d,0xff,0xff
     ];
 */
-    var diskII = diskII_16;
 
     _init();
 
@@ -583,7 +596,7 @@ function DiskII(io, callbacks, slot)
             if (_on) {
                 _writeMode = false;
                 _on = false;
-                callbacks.driveLight(_drive, false);
+                _emitter.emit('driveLight', _drive, false);
             }
         },
         getState: function disk2_getState() {
@@ -740,8 +753,8 @@ function DiskII(io, callbacks, slot)
                 var flags = 
                     prefix[0x10] | (prefix[0x11] << 8) |
                     (prefix[0x12] << 16) | (prefix[0x13] << 24);
-                _cur.readOnly = (flags & 0x80000000) ? true : false;
-                if (flags & 0x10) {
+                _cur.readOnly = (flags & 0x80000000) !== 0;
+                if ((flags & 0x10) !== 0) {
                     _cur.volume = flags & 0xff;
                 } else {
                     _cur.volume = 254;
@@ -817,6 +830,12 @@ function DiskII(io, callbacks, slot)
                 }
             }
             return data;
+        },
+
+        addDriveLightListener: function addDriveLightListener(fn) {
+            _emitter.on('driveLight', fn);
         }
     };
 }
+
+module.exports = DiskII;
