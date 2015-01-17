@@ -142,7 +142,7 @@ function mapKeyEvent(evt) {
         return keymap[code][evt.shiftKey ? 2 : (evt.ctrlKey ? 1 : 0)];
     }
     
-    debug("Unhandled key = " + toHex(code));
+    debug('Unhandled key = ' + toHex(code));
 
     return 0xFF;
 }

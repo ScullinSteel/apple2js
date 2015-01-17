@@ -38,7 +38,7 @@ var scanlines = false;
 
 function LoresPage(page) 
 {
-    "use strict";
+    'use strict';
 
     // $00-$3F inverse
     // $40-$7F flashing
@@ -367,7 +367,7 @@ function LoresPage(page)
 
 function HiresPage(page)
 { 
-    "use strict";
+    'use strict';
 
     var _page = page;
 

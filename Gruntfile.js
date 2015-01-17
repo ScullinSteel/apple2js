@@ -16,6 +16,10 @@ module.exports = function(grunt) {
                 globals: {
                     node: true
                 },
+                forin: true,
+                funcscope: true,
+                newcap: true,
+                quotmark: 'single',
                 unused: true
           }
         },

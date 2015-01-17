@@ -17,7 +17,7 @@ var toHex = Util.toHex;
 
 function CPU6502(options)
 {
-    "use strict";
+    'use strict';
 
     options = options || {};
 
@@ -712,327 +712,327 @@ function CPU6502(options)
 
     var ops = {
         // LDA
-        0xa9: ["LDA", lda, readImmediate, modes.immediate, 2],
-        0xa5: ["LDA", lda, readZeroPage, modes.zeroPage, 3],
-        0xb5: ["LDA", lda, readZeroPageX, modes.zeroPageX, 4],
-        0xad: ["LDA", lda, readAbsolute, modes.absolute, 4],
-        0xbd: ["LDA", lda, readAbsoluteX, modes.absoluteX, 4],
-        0xb9: ["LDA", lda, readAbsoluteY, modes.absoluteY, 4],
-        0xa1: ["LDA", lda, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0xb1: ["LDA", lda, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
+        0xa9: ['LDA', lda, readImmediate, modes.immediate, 2],
+        0xa5: ['LDA', lda, readZeroPage, modes.zeroPage, 3],
+        0xb5: ['LDA', lda, readZeroPageX, modes.zeroPageX, 4],
+        0xad: ['LDA', lda, readAbsolute, modes.absolute, 4],
+        0xbd: ['LDA', lda, readAbsoluteX, modes.absoluteX, 4],
+        0xb9: ['LDA', lda, readAbsoluteY, modes.absoluteY, 4],
+        0xa1: ['LDA', lda, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0xb1: ['LDA', lda, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
 
         // LDX
-        0xa2: ["LDX", ldx, readImmediate, modes.immediate, 2],
-        0xa6: ["LDX", ldx, readZeroPage, modes.zeroPage, 3],
-        0xb6: ["LDX", ldx, readZeroPageY, modes.zeroPageY, 4],
-        0xae: ["LDX", ldx, readAbsolute, modes.absolute, 4],
-        0xbe: ["LDX", ldx, readAbsoluteY, modes.absoluteY, 4],
+        0xa2: ['LDX', ldx, readImmediate, modes.immediate, 2],
+        0xa6: ['LDX', ldx, readZeroPage, modes.zeroPage, 3],
+        0xb6: ['LDX', ldx, readZeroPageY, modes.zeroPageY, 4],
+        0xae: ['LDX', ldx, readAbsolute, modes.absolute, 4],
+        0xbe: ['LDX', ldx, readAbsoluteY, modes.absoluteY, 4],
 
         // LDY
-        0xa0: ["LDY", ldy, readImmediate, modes.immediate, 2],
-        0xa4: ["LDY", ldy, readZeroPage, modes.zeroPage, 3],
-        0xb4: ["LDY", ldy, readZeroPageX, modes.zeroPageX, 4],
-        0xac: ["LDY", ldy, readAbsolute, modes.absolute, 4],
-        0xbc: ["LDY", ldy, readAbsoluteX, modes.absoluteX, 4],
+        0xa0: ['LDY', ldy, readImmediate, modes.immediate, 2],
+        0xa4: ['LDY', ldy, readZeroPage, modes.zeroPage, 3],
+        0xb4: ['LDY', ldy, readZeroPageX, modes.zeroPageX, 4],
+        0xac: ['LDY', ldy, readAbsolute, modes.absolute, 4],
+        0xbc: ['LDY', ldy, readAbsoluteX, modes.absoluteX, 4],
 
         // STA
-        0x85: ["STA", sta, writeZeroPage, modes.zeroPage, 3],
-        0x95: ["STA", sta, writeZeroPageX, modes.zeroPageX, 4],
-        0x8d: ["STA", sta, writeAbsolute, modes.absolute, 4],
-        0x9d: ["STA", sta, writeAbsoluteX, modes.absoluteX, 5],
-        0x99: ["STA", sta, writeAbsoluteY, modes.absoluteY, 5],
-        0x81: ["STA", sta, writeZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0x91: ["STA", sta, writeZeroPageIndirectY, modes.zeroPageIndirectY, 6],
+        0x85: ['STA', sta, writeZeroPage, modes.zeroPage, 3],
+        0x95: ['STA', sta, writeZeroPageX, modes.zeroPageX, 4],
+        0x8d: ['STA', sta, writeAbsolute, modes.absolute, 4],
+        0x9d: ['STA', sta, writeAbsoluteX, modes.absoluteX, 5],
+        0x99: ['STA', sta, writeAbsoluteY, modes.absoluteY, 5],
+        0x81: ['STA', sta, writeZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0x91: ['STA', sta, writeZeroPageIndirectY, modes.zeroPageIndirectY, 6],
 
         // STX
-        0x86: ["STX", stx, writeZeroPage, modes.zeroPage, 3],
-        0x96: ["STX", stx, writeZeroPageY, modes.zeroPageY, 4],
-        0x8e: ["STX", stx, writeAbsolute, modes.absolute, 4],
+        0x86: ['STX', stx, writeZeroPage, modes.zeroPage, 3],
+        0x96: ['STX', stx, writeZeroPageY, modes.zeroPageY, 4],
+        0x8e: ['STX', stx, writeAbsolute, modes.absolute, 4],
 
         // STY
-        0x84: ["STY", sty, writeZeroPage, modes.zeroPage, 3],
-        0x94: ["STY", sty, writeZeroPageX, modes.zeroPageX, 4],
-        0x8c: ["STY", sty, writeAbsolute, modes.absolute, 4],
+        0x84: ['STY', sty, writeZeroPage, modes.zeroPage, 3],
+        0x94: ['STY', sty, writeZeroPageX, modes.zeroPageX, 4],
+        0x8c: ['STY', sty, writeAbsolute, modes.absolute, 4],
 
         // ADC
-        0x69: ["ADC", adc, readImmediate, modes.immediate, 2],
-        0x65: ["ADC", adc, readZeroPage, modes.zeroPage, 3],
-        0x75: ["ADC", adc, readZeroPageX, modes.zeroPageX, 4],
-        0x6D: ["ADC", adc, readAbsolute, modes.absolute, 4],
-        0x7D: ["ADC", adc, readAbsoluteX, modes.absoluteX, 4],
-        0x79: ["ADC", adc, readAbsoluteY, modes.absoluteY, 4],
-        0x61: ["ADC", adc, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0x71: ["ADC", adc, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
+        0x69: ['ADC', adc, readImmediate, modes.immediate, 2],
+        0x65: ['ADC', adc, readZeroPage, modes.zeroPage, 3],
+        0x75: ['ADC', adc, readZeroPageX, modes.zeroPageX, 4],
+        0x6D: ['ADC', adc, readAbsolute, modes.absolute, 4],
+        0x7D: ['ADC', adc, readAbsoluteX, modes.absoluteX, 4],
+        0x79: ['ADC', adc, readAbsoluteY, modes.absoluteY, 4],
+        0x61: ['ADC', adc, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0x71: ['ADC', adc, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
 
         // SBC
-        0xe9: ["SBC", sbc, readImmediate, modes.immediate, 2],
-        0xe5: ["SBC", sbc, readZeroPage, modes.zeroPage, 3],
-        0xf5: ["SBC", sbc, readZeroPageX, modes.zeroPageX, 4],
-        0xeD: ["SBC", sbc, readAbsolute, modes.absolute, 4],
-        0xfD: ["SBC", sbc, readAbsoluteX, modes.absoluteX, 4],
-        0xf9: ["SBC", sbc, readAbsoluteY, modes.absoluteY, 4],
-        0xe1: ["SBC", sbc, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0xf1: ["SBC", sbc, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
+        0xe9: ['SBC', sbc, readImmediate, modes.immediate, 2],
+        0xe5: ['SBC', sbc, readZeroPage, modes.zeroPage, 3],
+        0xf5: ['SBC', sbc, readZeroPageX, modes.zeroPageX, 4],
+        0xeD: ['SBC', sbc, readAbsolute, modes.absolute, 4],
+        0xfD: ['SBC', sbc, readAbsoluteX, modes.absoluteX, 4],
+        0xf9: ['SBC', sbc, readAbsoluteY, modes.absoluteY, 4],
+        0xe1: ['SBC', sbc, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0xf1: ['SBC', sbc, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
 
         // INC
-        0xe6: ["INC", inc, readAddrZeroPage, modes.zeroPage, 5],
-        0xf6: ["INC", inc, readAddrZeroPageX, modes.zeroPageX, 6],
-        0xee: ["INC", inc, readAddrAbsolute, modes.absolute, 6],
-        0xfe: ["INC", inc, readAddrAbsoluteX, modes.absoluteX, 7],
+        0xe6: ['INC', inc, readAddrZeroPage, modes.zeroPage, 5],
+        0xf6: ['INC', inc, readAddrZeroPageX, modes.zeroPageX, 6],
+        0xee: ['INC', inc, readAddrAbsolute, modes.absolute, 6],
+        0xfe: ['INC', inc, readAddrAbsoluteX, modes.absoluteX, 7],
 
         // INX
-        0xe8: ["INX", inx, null, modes.implied, 2],
+        0xe8: ['INX', inx, null, modes.implied, 2],
 
         // INY
-        0xc8: ["INY", iny, null, modes.implied, 2],
+        0xc8: ['INY', iny, null, modes.implied, 2],
 
         // DEC
-        0xc6: ["DEC", dec, readAddrZeroPage, modes.zeroPage, 5],
-        0xd6: ["DEC", dec, readAddrZeroPageX, modes.zeroPageX, 6],
-        0xce: ["DEC", dec, readAddrAbsolute, modes.absolute, 6],
-        0xde: ["DEC", dec, readAddrAbsoluteX, modes.absoluteX, 7],
+        0xc6: ['DEC', dec, readAddrZeroPage, modes.zeroPage, 5],
+        0xd6: ['DEC', dec, readAddrZeroPageX, modes.zeroPageX, 6],
+        0xce: ['DEC', dec, readAddrAbsolute, modes.absolute, 6],
+        0xde: ['DEC', dec, readAddrAbsoluteX, modes.absoluteX, 7],
 
         // DEX
-        0xca: ["DEX", dex, null, modes.implied, 2],
+        0xca: ['DEX', dex, null, modes.implied, 2],
 
         // DEY
-        0x88: ["DEY", dey, null, modes.implied, 2],
+        0x88: ['DEY', dey, null, modes.implied, 2],
 
         // ASL
-        0x0A: ["ASL", aslA, null, modes.accumulator, 2],
-        0x06: ["ASL", asl, readAddrZeroPage, modes.zeroPage, 5],
-        0x16: ["ASL", asl, readAddrZeroPageX, modes.zeroPageX, 6],
-        0x0E: ["ASL", asl, readAddrAbsolute, modes.absolute, 6],
-        0x1E: ["ASL", asl, readAddrAbsoluteX, modes.absoluteX, 7],
+        0x0A: ['ASL', aslA, null, modes.accumulator, 2],
+        0x06: ['ASL', asl, readAddrZeroPage, modes.zeroPage, 5],
+        0x16: ['ASL', asl, readAddrZeroPageX, modes.zeroPageX, 6],
+        0x0E: ['ASL', asl, readAddrAbsolute, modes.absolute, 6],
+        0x1E: ['ASL', asl, readAddrAbsoluteX, modes.absoluteX, 7],
 
         // LSR
-        0x4A: ["LSR", lsrA, null, modes.accumulator, 2],
-        0x46: ["LSR", lsr, readAddrZeroPage, modes.zeroPage, 5],
-        0x56: ["LSR", lsr, readAddrZeroPageX, modes.zeroPageX, 6],
-        0x4E: ["LSR", lsr, readAddrAbsolute, modes.absolute, 6],
-        0x5E: ["LSR", lsr, readAddrAbsoluteX, modes.absoluteX, 7],
+        0x4A: ['LSR', lsrA, null, modes.accumulator, 2],
+        0x46: ['LSR', lsr, readAddrZeroPage, modes.zeroPage, 5],
+        0x56: ['LSR', lsr, readAddrZeroPageX, modes.zeroPageX, 6],
+        0x4E: ['LSR', lsr, readAddrAbsolute, modes.absolute, 6],
+        0x5E: ['LSR', lsr, readAddrAbsoluteX, modes.absoluteX, 7],
 
         // ROL
-        0x2A: ["ROL", rolA, null, modes.accumulator, 2],
-        0x26: ["ROL", rol, readAddrZeroPage, modes.zeroPage, 5],
-        0x36: ["ROL", rol, readAddrZeroPageX, modes.zeroPageX, 6],
-        0x2E: ["ROL", rol, readAddrAbsolute, modes.absolute, 6],
-        0x3E: ["ROL", rol, readAddrAbsoluteX, modes.absoluteX, 7],
+        0x2A: ['ROL', rolA, null, modes.accumulator, 2],
+        0x26: ['ROL', rol, readAddrZeroPage, modes.zeroPage, 5],
+        0x36: ['ROL', rol, readAddrZeroPageX, modes.zeroPageX, 6],
+        0x2E: ['ROL', rol, readAddrAbsolute, modes.absolute, 6],
+        0x3E: ['ROL', rol, readAddrAbsoluteX, modes.absoluteX, 7],
 
         // ROR
-        0x6A: ["ROR", rorA, null, modes.accumulator, 2],
-        0x66: ["ROR", ror, readAddrZeroPage, modes.zeroPage, 5],
-        0x76: ["ROR", ror, readAddrZeroPageX, modes.zeroPageX, 6],
-        0x6E: ["ROR", ror, readAddrAbsolute, modes.absolute, 6],
-        0x7E: ["ROR", ror, readAddrAbsoluteX, modes.absoluteX, 7],
+        0x6A: ['ROR', rorA, null, modes.accumulator, 2],
+        0x66: ['ROR', ror, readAddrZeroPage, modes.zeroPage, 5],
+        0x76: ['ROR', ror, readAddrZeroPageX, modes.zeroPageX, 6],
+        0x6E: ['ROR', ror, readAddrAbsolute, modes.absolute, 6],
+        0x7E: ['ROR', ror, readAddrAbsoluteX, modes.absoluteX, 7],
 
         // AND
-        0x29: ["AND", and, readImmediate, modes.immediate, 2],
-        0x25: ["AND", and, readZeroPage, modes.zeroPage, 2],
-        0x35: ["AND", and, readZeroPageX, modes.zeroPageX, 3],
-        0x2D: ["AND", and, readAbsolute, modes.absolute, 4],
-        0x3D: ["AND", and, readAbsoluteX, modes.absoluteX, 4],
-        0x39: ["AND", and, readAbsoluteY, modes.absoluteY, 4],
-        0x21: ["AND", and, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0x31: ["AND", and, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
+        0x29: ['AND', and, readImmediate, modes.immediate, 2],
+        0x25: ['AND', and, readZeroPage, modes.zeroPage, 2],
+        0x35: ['AND', and, readZeroPageX, modes.zeroPageX, 3],
+        0x2D: ['AND', and, readAbsolute, modes.absolute, 4],
+        0x3D: ['AND', and, readAbsoluteX, modes.absoluteX, 4],
+        0x39: ['AND', and, readAbsoluteY, modes.absoluteY, 4],
+        0x21: ['AND', and, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0x31: ['AND', and, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
 
         // ORA
-        0x09: ["ORA", ora, readImmediate, modes.immediate, 2],
-        0x05: ["ORA", ora, readZeroPage, modes.zeroPage, 2],
-        0x15: ["ORA", ora, readZeroPageX, modes.zeroPageX, 3],
-        0x0D: ["ORA", ora, readAbsolute, modes.absolute, 4],
-        0x1D: ["ORA", ora, readAbsoluteX, modes.absoluteX, 4],
-        0x19: ["ORA", ora, readAbsoluteY, modes.absoluteY, 4],
-        0x01: ["ORA", ora, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0x11: ["ORA", ora, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
+        0x09: ['ORA', ora, readImmediate, modes.immediate, 2],
+        0x05: ['ORA', ora, readZeroPage, modes.zeroPage, 2],
+        0x15: ['ORA', ora, readZeroPageX, modes.zeroPageX, 3],
+        0x0D: ['ORA', ora, readAbsolute, modes.absolute, 4],
+        0x1D: ['ORA', ora, readAbsoluteX, modes.absoluteX, 4],
+        0x19: ['ORA', ora, readAbsoluteY, modes.absoluteY, 4],
+        0x01: ['ORA', ora, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0x11: ['ORA', ora, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
 
         // EOR
-        0x49: ["EOR", eor, readImmediate, modes.immediate, 2],
-        0x45: ["EOR", eor, readZeroPage, modes.zeroPage, 3],
-        0x55: ["EOR", eor, readZeroPageX, modes.zeroPageX, 4],
-        0x4D: ["EOR", eor, readAbsolute, modes.absolute, 4],
-        0x5D: ["EOR", eor, readAbsoluteX, modes.absoluteX, 4],
-        0x59: ["EOR", eor, readAbsoluteY, modes.absoluteY, 4],
-        0x41: ["EOR", eor, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0x51: ["EOR", eor, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
+        0x49: ['EOR', eor, readImmediate, modes.immediate, 2],
+        0x45: ['EOR', eor, readZeroPage, modes.zeroPage, 3],
+        0x55: ['EOR', eor, readZeroPageX, modes.zeroPageX, 4],
+        0x4D: ['EOR', eor, readAbsolute, modes.absolute, 4],
+        0x5D: ['EOR', eor, readAbsoluteX, modes.absoluteX, 4],
+        0x59: ['EOR', eor, readAbsoluteY, modes.absoluteY, 4],
+        0x41: ['EOR', eor, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0x51: ['EOR', eor, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
 
         // CMP
-        0xc9: ["CMP", cmp, readImmediate, modes.immediate, 2],
-        0xc5: ["CMP", cmp, readZeroPage, modes.zeroPage, 3],
-        0xd5: ["CMP", cmp, readZeroPageX, modes.zeroPageX, 4],
-        0xcD: ["CMP", cmp, readAbsolute, modes.absolute, 4],
-        0xdD: ["CMP", cmp, readAbsoluteX, modes.absoluteX, 4],
-        0xd9: ["CMP", cmp, readAbsoluteY, modes.absoluteY, 4],
-        0xc1: ["CMP", cmp, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
-        0xd1: ["CMP", cmp, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
+        0xc9: ['CMP', cmp, readImmediate, modes.immediate, 2],
+        0xc5: ['CMP', cmp, readZeroPage, modes.zeroPage, 3],
+        0xd5: ['CMP', cmp, readZeroPageX, modes.zeroPageX, 4],
+        0xcD: ['CMP', cmp, readAbsolute, modes.absolute, 4],
+        0xdD: ['CMP', cmp, readAbsoluteX, modes.absoluteX, 4],
+        0xd9: ['CMP', cmp, readAbsoluteY, modes.absoluteY, 4],
+        0xc1: ['CMP', cmp, readZeroPageXIndirect, modes.zeroPageXIndirect, 6],
+        0xd1: ['CMP', cmp, readZeroPageIndirectY, modes.zeroPageIndirectY, 5],
 
         // CPX
-        0xE0: ["CPX", cpx, readImmediate, modes.immediate, 2],
-        0xE4: ["CPX", cpx, readZeroPage, modes.zeroPage, 3],
-        0xEC: ["CPX", cpx, readAbsolute, modes.absolute, 4],
+        0xE0: ['CPX', cpx, readImmediate, modes.immediate, 2],
+        0xE4: ['CPX', cpx, readZeroPage, modes.zeroPage, 3],
+        0xEC: ['CPX', cpx, readAbsolute, modes.absolute, 4],
 
         // CPY
-        0xC0: ["CPY", cpy, readImmediate, modes.immediate, 2],
-        0xC4: ["CPY", cpy, readZeroPage, modes.zeroPage, 3],
-        0xCC: ["CPY", cpy, readAbsolute, modes.absolute, 4],
+        0xC0: ['CPY', cpy, readImmediate, modes.immediate, 2],
+        0xC4: ['CPY', cpy, readZeroPage, modes.zeroPage, 3],
+        0xCC: ['CPY', cpy, readAbsolute, modes.absolute, 4],
 
         // BIT
-        0x24: ["BIT", bit, readZeroPage, modes.zeroPage, 3],
-        0x2C: ["BIT", bit, readAbsolute, modes.absolute, 4],
+        0x24: ['BIT', bit, readZeroPage, modes.zeroPage, 3],
+        0x2C: ['BIT', bit, readAbsolute, modes.absolute, 4],
 
         // BCC
-        0x90: ["BCC", brc, flags.C, modes.relative, 2],
+        0x90: ['BCC', brc, flags.C, modes.relative, 2],
 
         // BCS
-        0xB0: ["BCS", brs, flags.C, modes.relative, 2],
+        0xB0: ['BCS', brs, flags.C, modes.relative, 2],
 
         // BEQ
-        0xF0: ["BEQ", brs, flags.Z, modes.relative, 2],
+        0xF0: ['BEQ', brs, flags.Z, modes.relative, 2],
 
         // BMI
-        0x30: ["BMI", brs, flags.N, modes.relative, 2],
+        0x30: ['BMI', brs, flags.N, modes.relative, 2],
 
         // BNE
-        0xD0: ["BNE", brc, flags.Z, modes.relative, 2],
+        0xD0: ['BNE', brc, flags.Z, modes.relative, 2],
 
         // BPL
-        0x10: ["BPL", brc, flags.N, modes.relative, 2],
+        0x10: ['BPL', brc, flags.N, modes.relative, 2],
 
         // BVC
-        0x50: ["BVC", brc, flags.V, modes.relative, 2],
+        0x50: ['BVC', brc, flags.V, modes.relative, 2],
 
         // BVS
-        0x70: ["BVS", brs, flags.V, modes.relative, 2],
+        0x70: ['BVS', brs, flags.V, modes.relative, 2],
 
         // TAX
-        0xAA: ["TAX", tax, null, modes.implied, 2],
+        0xAA: ['TAX', tax, null, modes.implied, 2],
 
         // TXA
-        0x8A: ["TXA", txa, null, modes.implied, 2],
+        0x8A: ['TXA', txa, null, modes.implied, 2],
 
         // TAY
-        0xA8: ["TAY", tay, null, modes.implied, 2],
+        0xA8: ['TAY', tay, null, modes.implied, 2],
 
         // TYA
-        0x98: ["TYA", tya, null, modes.implied, 2],
+        0x98: ['TYA', tya, null, modes.implied, 2],
 
         // TSX
-        0xBA: ["TSX", tsx, null, modes.implied, 2],
+        0xBA: ['TSX', tsx, null, modes.implied, 2],
 
         // TXS
-        0x9A: ["TXS", txs, null, modes.implied, 2],
+        0x9A: ['TXS', txs, null, modes.implied, 2],
 
         // PHA
-        0x48: ["PHA", pha, null, modes.implied, 3],
+        0x48: ['PHA', pha, null, modes.implied, 3],
 
         // PLA
-        0x68: ["PLA", pla, null, modes.implied, 4],
+        0x68: ['PLA', pla, null, modes.implied, 4],
 
         // PHP
-        0x08: ["PHP", php, null, modes.implied, 3],
+        0x08: ['PHP', php, null, modes.implied, 3],
 
         // PLP
-        0x28: ["PLP", plp, null, modes.implied, 4],
+        0x28: ['PLP', plp, null, modes.implied, 4],
 
         // JMP
-        0x4C: ["JMP", jmp, 
+        0x4C: ['JMP', jmp, 
                readAddrAbsolute, modes.absolute, 3],
-        0x6C: ["JMP", jmp, 
+        0x6C: ['JMP', jmp, 
                readAddrAbsoluteIndirectBug, modes.absoluteIndirect, 5],
 
         // JSR
-        0x20: ["JSR", jsr, readAddrAbsolute, modes.absolute, 6],
+        0x20: ['JSR', jsr, readAddrAbsolute, modes.absolute, 6],
 
         // RTS
-        0x60: ["RTS", rts, null, modes.implied, 6],
+        0x60: ['RTS', rts, null, modes.implied, 6],
         
         // RTI
-        0x40: ["RTI", rti, null, modes.implied, 6],
+        0x40: ['RTI', rti, null, modes.implied, 6],
 
         // SEC
-        0x38: ["SEC", set, flags.C, modes.implied, 2],
+        0x38: ['SEC', set, flags.C, modes.implied, 2],
 
        // SED
-        0xF8: ["SED", set, flags.D, modes.implied, 2],
+        0xF8: ['SED', set, flags.D, modes.implied, 2],
 
         // SEI
-        0x78: ["SEI", set, flags.I, modes.implied, 2],
+        0x78: ['SEI', set, flags.I, modes.implied, 2],
 
         // CLC
-        0x18: ["CLC", clr, flags.C, modes.implied, 2],
+        0x18: ['CLC', clr, flags.C, modes.implied, 2],
 
         // CLD
-        0xD8: ["CLD", clr, flags.D, modes.implied, 2],
+        0xD8: ['CLD', clr, flags.D, modes.implied, 2],
 
         // CLI
-        0x58: ["CLI", clr, flags.I, modes.implied, 2],
+        0x58: ['CLI', clr, flags.I, modes.implied, 2],
 
         // CLV
-        0xB8: ["CLV", clr, flags.V, modes.implied, 2],
+        0xB8: ['CLV', clr, flags.V, modes.implied, 2],
 
         // NOP
-        0xea: ["NOP", nop, null, modes.implied, 2],
+        0xea: ['NOP', nop, null, modes.implied, 2],
 
         // BRK
-        0x00: ["BRK", brk, readImmediate, modes.immediate, 7]
+        0x00: ['BRK', brk, readImmediate, modes.immediate, 7]
     };
 
     /* 65C02 Instructions */
     
     var cops = {
         // INC / DEC A
-        0x1A: ["INC", incA, null, modes.accumulator, 2],
-        0x3A: ["DEC", decA, null, modes.accumulator, 2],
+        0x1A: ['INC', incA, null, modes.accumulator, 2],
+        0x3A: ['DEC', decA, null, modes.accumulator, 2],
 
         // Indirect Zero Page for the masses
-        0x12: ["ORA", ora, readZeroPageIndirect, modes.zeroPageIndirect, 5],
-        0x32: ["AND", and, readZeroPageIndirect, modes.zeroPageIndirect, 5],
-        0x52: ["EOR", eor, readZeroPageIndirect, modes.zeroPageIndirect, 5],
-        0x72: ["ADC", adc, readZeroPageIndirect, modes.zeroPageIndirect, 5],
-        0x92: ["STA", sta, writeZeroPageIndirect, modes.zeroPageIndirect, 5],
-        0xB2: ["LDA", lda, readZeroPageIndirect, modes.zeroPageIndirect, 5],
-        0xD2: ["CMP", cmp, readZeroPageIndirect, modes.zeroPageIndirect, 5],
-        0xF2: ["SBC", sbc, readZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0x12: ['ORA', ora, readZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0x32: ['AND', and, readZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0x52: ['EOR', eor, readZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0x72: ['ADC', adc, readZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0x92: ['STA', sta, writeZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0xB2: ['LDA', lda, readZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0xD2: ['CMP', cmp, readZeroPageIndirect, modes.zeroPageIndirect, 5],
+        0xF2: ['SBC', sbc, readZeroPageIndirect, modes.zeroPageIndirect, 5],
 
         // Better BIT
-        0x34: ["BIT", bit, readZeroPageX, modes.zeroPageX, 4],
-        0x3C: ["BIT", bit, readAbsoluteX, modes.absoluteX, 4],
-        0x89: ["BIT", bitI, readImmediate, modes.immediate, 2],
+        0x34: ['BIT', bit, readZeroPageX, modes.zeroPageX, 4],
+        0x3C: ['BIT', bit, readAbsoluteX, modes.absoluteX, 4],
+        0x89: ['BIT', bitI, readImmediate, modes.immediate, 2],
 
         // JMP absolute indirect indexed
-        0x6C: ["JMP", jmp, readAddrAbsoluteIndirect, 
+        0x6C: ['JMP', jmp, readAddrAbsoluteIndirect, 
                modes.absoluteIndirect, 6],
-        0x7C: ["JMP", jmp, readAddrAbsoluteXIndirect, 
+        0x7C: ['JMP', jmp, readAddrAbsoluteXIndirect, 
                modes.absoluteXIndirect, 6],
 
         // BRA
-        0x80: ["BRA", brc, 0, modes.relative, 3],
+        0x80: ['BRA', brc, 0, modes.relative, 3],
 
         // PHX
-        0xDA: ["PHX", phx, null, modes.implied, 3],
+        0xDA: ['PHX', phx, null, modes.implied, 3],
 
         // PHY
-        0x5A: ["PHY", phy, null, modes.implied, 3],
+        0x5A: ['PHY', phy, null, modes.implied, 3],
 
         // PLX
-        0xFA: ["PLX", plx, null, modes.implied, 3],
+        0xFA: ['PLX', plx, null, modes.implied, 3],
 
         // PLY
-        0x7A: ["PLY", ply, null, modes.implied, 3],
+        0x7A: ['PLY', ply, null, modes.implied, 3],
 
         // STZ
-        0x64: ["STZ", stz, writeZeroPage, modes.zeroPage, 3],
-        0x74: ["STZ", stz, writeZeroPageX, modes.zeroPageX, 4],
-        0x9C: ["STZ", stz, writeAbsolute, modes.absolute, 4],
-        0x9E: ["STZ", stz, writeAbsoluteX, modes.absoluteX, 5],
+        0x64: ['STZ', stz, writeZeroPage, modes.zeroPage, 3],
+        0x74: ['STZ', stz, writeZeroPageX, modes.zeroPageX, 4],
+        0x9C: ['STZ', stz, writeAbsolute, modes.absolute, 4],
+        0x9E: ['STZ', stz, writeAbsoluteX, modes.absoluteX, 5],
         
         // TRB
-        0x14: ["TRB", trb, readAddrZeroPage, modes.zeroPage, 5],
-        0x1C: ["TRB", trb, readAddrAbsolute, modes.absolute, 6],
+        0x14: ['TRB', trb, readAddrZeroPage, modes.zeroPage, 5],
+        0x1C: ['TRB', trb, readAddrAbsolute, modes.absolute, 6],
 
         // TSB
-        0x04: ["TSB", tsb, readAddrZeroPage, modes.zeroPage, 5],
-        0x0C: ["TSB", tsb, readAddrAbsolute, modes.absolute, 6]
+        0x04: ['TSB', tsb, readAddrZeroPage, modes.zeroPage, 5],
+        0x0C: ['TSB', tsb, readAddrAbsolute, modes.absolute, 6]
     };
 
     if (is65C02) {
@@ -1050,13 +1050,13 @@ function CPU6502(options)
         var unk;
 
         if (is65C02) {
-            unk = ["NOP (" + toHex(b) + ")", function() {
-                debug("Unknown OpCode: " + toHex(b) + " at " + toHex(pc - 1, 4));
+            unk = ['NOP (' + toHex(b) + ')', function() {
+                debug('Unknown OpCode: ' + toHex(b) + ' at ' + toHex(pc - 1, 4));
             }, null, modes.implied, 2];
         } else {
-            unk = ["???", 
-                   function() { /* debug("Unknown OpCode: " + toHex(b) +
-                                      " at " + toHex(pc - 1, 4)); */ }, 
+            unk = ['???', 
+                   function() { /* debug('Unknown OpCode: ' + toHex(b) +
+                                      ' at ' + toHex(pc - 1, 4)); */ }, 
                    null, modes.implied,
                    1];
         }
@@ -1076,21 +1076,21 @@ function CPU6502(options)
             if (symbols && symbols[v]) {
                 return symbols[v];
             } else {
-                return "$" + toHex(v, n);
+                return '$' + toHex(v, n);
             }
         }
-        var result = "";
+        var result = '';
         switch (m) {
         case modes.implied:
             break;
         case modes.immediate:
-            result = "#" + toHexOrSymbol(readByte(addr, true));
+            result = '#' + toHexOrSymbol(readByte(addr, true));
             break;
         case modes.absolute:
-            result = "" + toHexOrSymbol(readWord(addr, true), 4);
+            result = '' + toHexOrSymbol(readWord(addr, true), 4);
             break;
         case modes.zeroPage:
-            result = "" + toHexOrSymbol(readByte(addr, true));
+            result = '' + toHexOrSymbol(readByte(addr, true));
             break;
         case modes.relative:
             {
@@ -1099,38 +1099,38 @@ function CPU6502(options)
                     off -= 256;
                 }
                 addr += off + 1;
-                result = "" + toHexOrSymbol(addr, 4) + " (" + off + ")";
+                result = '' + toHexOrSymbol(addr, 4) + ' (' + off + ')';
             }
             break;
         case modes.absoluteX:
-            result = "" + toHexOrSymbol(readWord(addr, true), 4) + ",X";
+            result = '' + toHexOrSymbol(readWord(addr, true), 4) + ',X';
             break;
         case modes.absoluteY:
-            result = "" + toHexOrSymbol(readWord(addr, true), 4) + ",Y";
+            result = '' + toHexOrSymbol(readWord(addr, true), 4) + ',Y';
             break;
         case modes.zeroPageX:
-            result = "" + toHexOrSymbol(readByte(addr, true)) + ",X";
+            result = '' + toHexOrSymbol(readByte(addr, true)) + ',X';
             break;
         case modes.zeroPageY:
-            result = "" + toHexOrSymbol(readByte(addr, true)) + ",Y";
+            result = '' + toHexOrSymbol(readByte(addr, true)) + ',Y';
             break;
         case modes.absoluteIndirect:
-            result = "(" + toHexOrSymbol(readWord(addr, true), 4) + ")";
+            result = '(' + toHexOrSymbol(readWord(addr, true), 4) + ')';
             break;
         case modes.zeroPageXIndirect:
-            result = "(" + toHexOrSymbol(readByte(addr, true)) + ",X)";
+            result = '(' + toHexOrSymbol(readByte(addr, true)) + ',X)';
             break;
         case modes.zeroPageIndirectY:
-            result = "(" + toHexOrSymbol(readByte(addr, true)) + "),Y";
+            result = '(' + toHexOrSymbol(readByte(addr, true)) + '),Y';
             break;
         case modes.accumulator:
-            result = "A";
+            result = 'A';
             break;
         case modes.zeroPageIndirect:
-            result = "(" + toHexOrSymbol(readByte(addr, true)) + ")";
+            result = '(' + toHexOrSymbol(readByte(addr, true)) + ')';
             break;
         case modes.absoluteXIndirect:
-            result = "(" + toHexOrSymbol(readWord(addr, true), 4) + ",X)";
+            result = '(' + toHexOrSymbol(readWord(addr, true), 4) + ',X)';
             break;
         default:
             break;
@@ -1264,35 +1264,35 @@ function CPU6502(options)
             var b = readByte(_pc, true),
                 op = ops[b],
                 size = sizes[op[3]],
-                result = toHex(_pc, 4) + "- ";
+                result = toHex(_pc, 4) + '- ';
 
             if (symbols) {
                 if (symbols[_pc]) {
                     result += symbols[_pc] + 
-                        "          ".substring(symbols[_pc].length);
+                        '          '.substring(symbols[_pc].length);
                 } else {
-                    result += "          ";
+                    result += '          ';
                 }
             }
 
             for (var idx = 0; idx < 4; idx++) {
                 if (idx < size) {
-                    result += toHex(readByte(_pc + idx, true)) + " ";
+                    result += toHex(readByte(_pc + idx, true)) + ' ';
                 } else {
-                    result += "   ";
+                    result += '   ';
                 }
             }
 
             if (op === undefined)
-                result += "??? (" + toHex(b) + ")";
+                result += '??? (' + toHex(b) + ')';
             else
-                result += op[0] + " " + dumpArgs(_pc + 1, op[3], symbols);
+                result += op[0] + ' ' + dumpArgs(_pc + 1, op[3], symbols);
             
             return result;
         },
 
         dumpPage: function(start, end) {
-            var result = "";
+            var result = '';
             if (start === undefined) {
                 start = pc >> 8;
             }
@@ -1302,21 +1302,21 @@ function CPU6502(options)
             for (var page = start; page <= end; page++) {
                 var b, idx, jdx;
                 for (idx = 0; idx < 16; idx++) {
-                    result += toHex(page) + toHex(idx << 4) + ": ";
+                    result += toHex(page) + toHex(idx << 4) + ': ';
                     for (jdx = 0; jdx < 16; jdx++) {
                         b = readByte(page * 256 + idx * 16 + jdx, true);
-                        result += toHex(b) + " ";
+                        result += toHex(b) + ' ';
                     }
-                    result += "        ";
+                    result += '        ';
                     for (jdx = 0; jdx < 16; jdx++) {
                         b = readByte(page * 256 + idx * 16 + jdx, true) & 0x7f;
                         if (b >= 0x20 && b < 0x7f) {
                             result += String.fromCharCode(b);
                         } else {
-                            result += ".";
+                            result += '.';
                         }
                     }
-                    result += "\n";
+                    result += '\n';
                 }
             }
             return result;
@@ -1371,20 +1371,20 @@ function CPU6502(options)
         
         dumpRegisters: function() {
             return toHex(pc, 4) +
-                "-   A=" + toHex(ar) +
-                " X=" + toHex(xr) +
-                " Y=" + toHex(yr) +
-                " P=" + toHex(sr) +
-                " S=" + toHex(sp) +
-                " " +
-                ((sr & flags.N) ? "N" : "-") +
-                ((sr & flags.V) ? "V" : "-") +
-                "-" + 
-                ((sr & flags.B) ? "B" : "-") +
-                ((sr & flags.D) ? "D" : "-") +
-                ((sr & flags.I) ? "I" : "-") +
-                ((sr & flags.Z) ? "Z" : "-") +
-                ((sr & flags.C) ? "C" : "-");
+                '-   A=' + toHex(ar) +
+                ' X=' + toHex(xr) +
+                ' Y=' + toHex(yr) +
+                ' P=' + toHex(sr) +
+                ' S=' + toHex(sp) +
+                ' ' +
+                ((sr & flags.N) ? 'N' : '-') +
+                ((sr & flags.V) ? 'V' : '-') +
+                '-' + 
+                ((sr & flags.B) ? 'B' : '-') +
+                ((sr & flags.D) ? 'D' : '-') +
+                ((sr & flags.I) ? 'I' : '-') +
+                ((sr & flags.Z) ? 'Z' : '-') +
+                ((sr & flags.C) ? 'C' : '-');
         },
 
         read: function(page, off) {

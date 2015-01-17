@@ -117,43 +117,43 @@ function Apple2IO(cpu, callbacks)
         var delta = now - _trigger;
         switch (off) {
         case LOC.CLR80VID:
-            // _debug("80 Column Mode off");
+            // _debug('80 Column Mode off');
             if ('_80col' in callbacks) callbacks._80col(false);
             break;
         case LOC.SET80VID:
-            // _debug("80 Column Mode on");
+            // _debug('80 Column Mode on');
             if ('_80col' in callbacks) callbacks._80col(true);
             break;
         case LOC.CLRALTCH:
-            // _debug("Alt Char off");
+            // _debug('Alt Char off');
             if ('altchar' in callbacks) callbacks.altchar(false);
             break;
         case LOC.SETALTCH:
-            // _debug("Alt Char on");
+            // _debug('Alt Char on');
             if ('altchar' in callbacks) callbacks.altchar(true);
             break;
         case LOC.CLRTEXT:
-            _debug("Graphics Mode");
+            _debug('Graphics Mode');
             callbacks.text(false);
             break;
         case LOC.SETTEXT:
-            _debug("Text Mode");
+            _debug('Text Mode');
             callbacks.text(true);
             break;
         case LOC.CLRMIXED:
-            _debug("Mixed Mode off");
+            _debug('Mixed Mode off');
             callbacks.mixed(false);
             break;
         case LOC.SETMIXED:
-            _debug("Mixed Mode on");
+            _debug('Mixed Mode on');
             callbacks.mixed(true);
             break;
         case LOC.CLRHIRES:
-            _debug("LoRes Mode");
+            _debug('LoRes Mode');
             callbacks.hires(false);
             break;
         case LOC.SETHIRES:
-            _debug("HiRes Mode");
+            _debug('HiRes Mode');
             callbacks.hires(true);
             break;
         case LOC.PAGE1:
@@ -271,7 +271,7 @@ function Apple2IO(cpu, callbacks)
             if (_tapeOffset < _tape.length) {
                 while (now >= _tapeNext) {
                     if ((_tapeOffset % 1000) === 0) {
-                        debug("Read " + (_tapeOffset / 1000));
+                        debug('Read ' + (_tapeOffset / 1000));
                     }
                     _tapeFlip = !_tapeFlip;
                     flipped = true;
@@ -281,7 +281,7 @@ function Apple2IO(cpu, callbacks)
             }
             /*
             if (flipped) {
-                debug("now=" + now + " next=" + _tapeNext + " (" + (_tapeNext - now) + ")");
+                debug('now=' + now + ' next=' + _tapeNext + ' (' + (_tapeNext - now) + ')');
             }
             */
 
@@ -323,7 +323,7 @@ function Apple2IO(cpu, callbacks)
             if (_locs[off]) {
                 result = _locs[off].ioSwitch(off);
             } else {
-                debug("I/O read: C0" + toHex(off));
+                debug('I/O read: C0' + toHex(off));
             }
             return result;
         },
@@ -332,7 +332,7 @@ function Apple2IO(cpu, callbacks)
             if (_locs[off]) {
                 _locs[off].ioSwitch(off, val);
             } else {
-                debug("I/O write: C0" + toHex(off));
+                debug('I/O write: C0' + toHex(off));
             }
         },
 
