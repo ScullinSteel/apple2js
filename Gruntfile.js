@@ -22,6 +22,13 @@ module.exports = function(grunt) {
                 unused: true
           }
         },
+        uglify: {
+            dist: {
+                files: {
+                    './dist/module.min.js': ['./dist/module.js']
+                }
+            }
+        },
         watch: {
             files: ['<%= jshint.files %>'],
             tasks: ['jshint','browserify']
@@ -30,7 +37,8 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     
-    grunt.registerTask('default', ['jshint', 'browserify']);  
+    grunt.registerTask('default', ['jshint', 'browserify', 'uglify']);  
 };

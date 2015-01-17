@@ -6,14 +6,19 @@
         "name": "Will Scullin",
         "email": "scullin@scullin.com"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/whscullin/apple2js.git"
+    },
     "dependencies": {
+        "canvas": "~1.1.6"
     },
     "devDependencies": {
         "browserify": "~8.0.3",
-        "canvas": "~1.1.6",
         "grunt": "~0.4.5",
         "grunt-browserify": "~3.2.1",
         "grunt-contrib-jshint": "~0.10.0",
+        "grunt-contrib-uglify": "~0.7.0",
         "grunt-contrib-watch": "~0.6.1",
         "jshint": "~2.5.0"
     }
