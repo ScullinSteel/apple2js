@@ -4,7 +4,7 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 src: [],
-                dest: 'dist/module.js',
+                dest: './dist/module.js',
                 options: {
                     require: ['./js/main.js'],
                 } 
@@ -26,6 +26,7 @@ module.exports = function(grunt) {
                 unused: true
           }
         },
+        clean: ['./dist'],
         uglify: {
             dist: {
                 files: {
@@ -40,6 +41,7 @@ module.exports = function(grunt) {
     });
     
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
