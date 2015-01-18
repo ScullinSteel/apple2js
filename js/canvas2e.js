@@ -177,12 +177,14 @@ function LoresPage(page)
                 base = addr - 0x400 * _page,
                 fore, back;
 
-            if (_buffer[bank][base] == val && !_refreshing)
+            if (_buffer[bank][base] == val && !_refreshing) {
                 return;
+            }
             _buffer[bank][base] = val;
 
-            if (bank !== 0 && !_80colMode)
+            if (bank !== 0 && !_80colMode) {
                 return;
+            }
 
             var col = (base % 0x80) % 0x28,
                 adj = off - col;
@@ -197,8 +199,9 @@ function LoresPage(page)
 
             var data = pages[_page].data;
             if ((row < 24) && (col < 40)) {
-                if (!textMode && hiresMode && !(mixedMode && row > 19))
+                if (!textMode && hiresMode && !(mixedMode && row > 19)) {
                     return;
+                }
 
                 var color;
                 if (textMode || (mixedMode && row > 19)) {
@@ -316,8 +319,9 @@ function LoresPage(page)
                 page = addr >> 8;
                 off = addr & 0xff;
                 this._write(addr >> 8, addr & 0xff, _buffer[0][idx], 0);
-                if (_80colMode)
+                if (_80colMode) {
                     this._write(addr >> 8, addr & 0xff, _buffer[1][idx], 1);
+                }
             }
             _refreshing = false;
         },
@@ -516,12 +520,14 @@ function HiresPage(page)
             }
             var addr = (page << 8) | off, base = addr - 0x2000 * _page,
             idx, jdx;
-            if (_buffer[bank][base] == val && !_refreshing)
+            if (_buffer[bank][base] == val && !_refreshing) {
                 return;
+            }
             _buffer[bank][base] = val;
             
-            if (bank !== 0 && !doubleHiresMode)
+            if (bank !== 0 && !doubleHiresMode) {
                 return;
+            }
 
             var hbs = val & 0x80;
             val &= 0x7f;
@@ -539,8 +545,9 @@ function HiresPage(page)
 
             var dx, dy, data = pages[_page].data;
             if ((rowa < 24) && (col < 40)) {
-                if (textMode || !hiresMode || (mixedMode && rowa > 19))
+                if (textMode || !hiresMode || (mixedMode && rowa > 19)) {
                     return;
+                }
                 
                 dy = rowa * 16 + rowb * 2;
                 var bz, b0, b1, b2, b3, b4, c;
@@ -665,8 +672,9 @@ function HiresPage(page)
                 page = addr >> 8;
                 off = addr & 0xff;
                 this._write(page, off, _buffer[0][idx], 0);
-                if (_80colMode)
+                if (_80colMode) {
                     this._write(page, off, _buffer[1][idx], 1);
+                }
             }
             _refreshing = false;
         },

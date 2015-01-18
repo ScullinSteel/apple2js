@@ -378,36 +378,41 @@ function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
             if (typeof val != 'undefined') {
                 _80store = true;
                 // _debug('80 Store On');
-            } else 
+            } else {
                 result = 0;
+            }
             break;
         case LOC.RAMRDOFF:
             if (typeof val != 'undefined') {
                 _auxRamRead = false;
                 _debug('Aux RAM Read Off');
-            } else 
+            } else {
                 result = 0;
+            }
             break;
         case LOC.RAMRDON:
             if (typeof val != 'undefined') {
                 _auxRamRead = true;
                 _debug('Aux RAM Read On');
-            } else 
+            } else {
                 result = 0;
+            }
             break;
         case LOC.RAMWROFF:
             if (typeof val != 'undefined') {
                 _auxRamWrite = false;
                 _debug('Aux RAM Write Off');
-            } else 
+            } else {
                 result = 0;
+            }
             break;
         case LOC.RAMWRON:
             if (typeof val != 'undefined') {
                 _auxRamWrite = true;
                 _debug('Aux RAM Write On');
-            } else 
+            } else {
                 result = 0;
+            }
             break;
 
         case LOC.INTCXROMOFF:
@@ -451,11 +456,15 @@ function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
 
         case LOC.PAGE1:
             _page2 = false;
-            if (!_80store) result = io.ioSwitch(off, val);
+            if (!_80store) {
+                result = io.ioSwitch(off, val);
+            }
             break;
         case LOC.PAGE2:
             _page2 = true;
-            if (!_80store) result = io.ioSwitch(off, val);
+            if (!_80store) {
+                result = io.ioSwitch(off, val);
+            }
             break;
 
         // Language Card Switches
@@ -561,8 +570,9 @@ function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
         }
         _last = off;
 
-        if (result !== undefined)
+        if (result !== undefined) {
             return result;
+        }
 
         result = 0;
 

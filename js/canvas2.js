@@ -131,8 +131,9 @@ function LoresPage(page)
             var addr = (page << 8) | off,
                 base = addr - 0x400 * _page;
 
-            if (_buffer[base] === val && !_refreshing)
+            if (_buffer[base] === val && !_refreshing) {
                 return;
+            }
             _buffer[base] = val;
 
             var col = (base % 0x80) % 0x28,
@@ -146,8 +147,9 @@ function LoresPage(page)
             var row = ab | cd | e, color, idx, jdx, b;
 
             if ((row < 24) && (col < 40)) {
-                if (!textMode && hiresMode && !(mixedMode && row > 19))
+                if (!textMode && hiresMode && !(mixedMode && row > 19)) {
                     return;
+                }
 
                 var data = pages[_page].data, fore, back;
                 off = (col * 14 + row * 560 * 8 * 2) * 4;
@@ -268,8 +270,9 @@ function HiresPage(page)
     function _init() {
         _buffer = allocMemPages(0x20);
 
-        for (var idx = 0; idx < 0x2000; idx++)
+        for (var idx = 0; idx < 0x2000; idx++) {
             _buffer[idx] = 0; // Math.floor(Math.random()*256);
+        }
     }
  
     function _drawPixel(data, off, color) {
@@ -305,8 +308,9 @@ function HiresPage(page)
             }
             var addr = (page << 8) | off,
                 base = addr - 0x2000 * _page;
-            if (_buffer[base] === val && !_refreshing)
+            if (_buffer[base] === val && !_refreshing) {
                 return;
+            }
             _buffer[base] = val;
             
             var hbs = val & 0x80;
@@ -324,8 +328,9 @@ function HiresPage(page)
                 rowb = base >> 10;
 
             if ((rowa < 24) && (col < 40)) {
-                if (textMode || !hiresMode || (mixedMode && rowa > 19))
+                if (textMode || !hiresMode || (mixedMode && rowa > 19)) {
                     return;
+                }
                 
                 var data = pages[_page].data,
                 dy = rowa * 8 + rowb,

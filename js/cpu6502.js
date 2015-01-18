@@ -129,27 +129,32 @@ function CPU6502(options)
     }
 
     function add(a, b, sub) {
-        if (sub) 
+        if (sub) {
             b ^= 0xff;
+        }
   
         // KEGS
         var c, v;
         if ((sr & flags.D) !== 0) {
             c = (a & 0x0f) + (b & 0x0f) + (sr & flags.C);
             if (sub) {
-                if (c < 0x10)
+                if (c < 0x10) {
                     c = (c - 0x06) & 0x0f;
+                }
                 c += (a & 0xf0) + (b & 0xf0);
                 v = (c >> 1) ^ c;
-                if (c < 0x100) 
+                if (c < 0x100) {
                     c = (c + 0xa0) & 0xff;
+                }
             } else {
-                if (c > 0x09)
+                if (c > 0x09) {
                     c = (c - 0x0a) | 0x10; // carry to MSN
+                }
                 c += (a & 0xf0) + (b & 0xf0);
                 v = (c >> 1) ^ c;
-                if (c > 0x99)
+                if (c > 0x99) {
                     c += 0x60;
+                }
             }
         } else {
             c = a + b + (sr & flags.C);
@@ -631,7 +636,9 @@ function CPU6502(options)
             var oldPC = pc;
             pc += off > 127 ? off - 256 : off;
             cycles++;
-            if ((pc >> 8) != (oldPC >> 8)) cycles++;
+            if ((pc >> 8) != (oldPC >> 8)) {
+                cycles++;
+            }
         }
     }
 
@@ -641,7 +648,9 @@ function CPU6502(options)
             var oldPC = pc;
             pc += off > 127 ? off - 256 : off;
             cycles++;
-            if ((pc >> 8) != (oldPC >> 8)) cycles++;
+            if ((pc >> 8) != (oldPC >> 8)) {
+                cycles++;
+            }
         }
     }
     
@@ -1203,13 +1212,16 @@ function CPU6502(options)
 
         addPageHandler: function(pho) {
             for (var idx = pho.start(); idx <= pho.end(); idx++) {
-                if (pho.read)
+                if (pho.read) {
                     readPages[idx] = pho;
-                if (pho.write)
+                }
+                if (pho.write) {
                     writePages[idx] = pho;
+                }
             }
-            if (pho.reset)
+            if (pho.reset) {
                 resetHandlers.push(pho);
+            }
         },
 
         reset: function cpu_reset()
@@ -1283,11 +1295,12 @@ function CPU6502(options)
                 }
             }
 
-            if (op === undefined)
+            if (op === undefined) {
                 result += '??? (' + toHex(b) + ')';
-            else
+            } else {
                 result += op[0] + ' ' + dumpArgs(_pc + 1, op[3], symbols);
-            
+            }
+
             return result;
         },
 

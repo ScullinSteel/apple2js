@@ -320,8 +320,9 @@ function KeyBoard(io) {
                         self.capslockKey(!capslocked);
                         break;
                     case 'POW':
-                        if (window.confirm('Power Cycle?'))
+                        if (window.confirm('Power Cycle?')) {
                             window.location.reload();
+                        }
                         break;
                     case 'OPEN_APPLE':
                         self.commandKey(!commanded);
@@ -363,10 +364,11 @@ function KeyBoard(io) {
                     key.classList.add('key-' + key1.replace(/[&#;]/g,''));
 
                     if (key1.length > 1) {
-                        if (key1 == 'LOCK')
+                        if (key1 == 'LOCK') {
                             key.classList.add('vcenter2');
-                        else
+                        } else if (key1.substr(0,1) != '&') {
                             key.classList.add('vcenter');
+                        }
                     }
                     if (key1 != key2) {
                         key.classList.add('key-' + key2.replace(/[&;]/g,''));

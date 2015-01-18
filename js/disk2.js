@@ -155,9 +155,9 @@ function DiskII(io, slot)
          * Gap 1/3 (40/0x28 bytes)
          */
 
-        if (sector === 0) // Gap 1
+        if (sector === 0) { // Gap 1
             gap = 0x80;
-        else { // Gap 3
+        } else { // Gap 3
             gap = track === 0 ? 0x28 : 0x26;
         }
 
@@ -213,8 +213,9 @@ function DiskII(io, slot)
             nibbles[ptr6 + idx6] = val6;
             nibbles[ptr2 + idx2] = val2;
             
-            if (--idx2 < 0) 
+            if (--idx2 < 0) {
                 idx2 = 0x55;
+            }
         }
         
         var last = 0;
@@ -283,14 +284,15 @@ function DiskII(io, slot)
         if (_skip || _writeMode) {
             var t = _cur.tracks[_cur.track >> 1];
             if (t && t.length) {
-                if (_cur.head >= t.length)
+                if (_cur.head >= t.length) {
                     _cur.head = 0;
+                }
 
                 if (_writeMode) {
                     t[_cur.head] = _latch;
-                } else
+                } else {
                     result = t[_cur.head];
-
+                }
                 ++_cur.head;
             }
         } 
@@ -378,12 +380,15 @@ function DiskII(io, slot)
                         }
                         data2[jdx] >>= 1;
 
-                        if (--jdx < 0) jdx = 0x55;
+                        if (--jdx < 0) {
+                            jdx = 0x55;
+                        }
                     }
                     return data;
                 }
-                else
+                else {
                     _skipBytes(0x159); // Skip data, checksum and footer
+                }
                 state = 0;
                 break;
             default:
@@ -404,10 +409,12 @@ function DiskII(io, slot)
             _cur.track += _phase_delta[_cur.phase][phase];
             _cur.phase = phase;
 
-            if (_cur.track > _cur.tracks.length * 2 - 1)
+            if (_cur.track > _cur.tracks.length * 2 - 1) {
                 _cur.track = _cur.tracks.length * 2 - 1;
-            if (_cur.track < 0x0)
+            }
+            if (_cur.track < 0x0) {
                 _cur.track = 0x0;
+            }
 
             /* _debug('Drive ' + _drive + 
                    ', track ' + toHex(_cur.track >> 1) + 

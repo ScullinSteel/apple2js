@@ -10,16 +10,12 @@
  * implied warranty.
  */
 
-/*exported Parallel */
-
 function Parallel(io, cbs, slot) {
     slot = slot || 1;
 
     var LOC = {
         IOREG: 0x80
     };
-
-    var _cbs = cbs;
 
     var rom = [
         0x18,0xb0,0x38,0x48,0x8a,0x48,0x98,0x48,
@@ -66,8 +62,9 @@ function Parallel(io, cbs, slot) {
             return 0xc0 + slot;
         },
         ioSwitch: function(off, val) {
-            if (off == LOC.IOREG && val && 'putChar' in _cbs)
-                _cbs.putChar(val);
+            if (off == LOC.IOREG && val && 'putChar' in cbs) {
+                cbs.putChar(val);
+            }
         },
         read: function(page, off) {
             return rom[off];
@@ -76,4 +73,4 @@ function Parallel(io, cbs, slot) {
     };
 }
 
-    
+module.exports = Parallel;

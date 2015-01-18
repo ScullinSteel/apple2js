@@ -17,6 +17,7 @@ module.exports = function(grunt) {
                 'js/ui/*.js'
             ],
             options: {
+                curly: true,
                 forin: true,
                 funcscope: true,
                 newcap: true,
@@ -26,7 +27,9 @@ module.exports = function(grunt) {
                 unused: true
           }
         },
-        clean: ['./dist'],
+        clean: {
+            dist: ['./dist'],
+        },
         uglify: {
             dist: {
                 files: {

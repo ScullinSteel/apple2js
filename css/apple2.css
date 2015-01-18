@@ -183,11 +183,16 @@ canvas {
     float: right;
     padding: 0px;
     margin: 0px;
-    border-radius: 6px;
-    border: 5px outset #66594E;
+    border-radius: 3px;
+    border: 3px outset #66594E;
     color: white;
     background-color: #44372C;
     font: 9px sans-serif;
+}
+
+#reset:active {
+    background-color: #22150A;
+    border: 5px outset #44372C;
 }
 
 #keyboard {

@@ -118,19 +118,27 @@ function Apple2IO(cpu, callbacks)
         switch (off) {
         case LOC.CLR80VID:
             // _debug('80 Column Mode off');
-            if ('_80col' in callbacks) callbacks._80col(false);
+            if ('_80col' in callbacks) {
+                callbacks._80col(false);
+            }
             break;
         case LOC.SET80VID:
             // _debug('80 Column Mode on');
-            if ('_80col' in callbacks) callbacks._80col(true);
+            if ('_80col' in callbacks) {
+                callbacks._80col(true);
+            }
             break;
         case LOC.CLRALTCH:
             // _debug('Alt Char off');
-            if ('altchar' in callbacks) callbacks.altchar(false);
+            if ('altchar' in callbacks) {
+                callbacks.altchar(false);
+            }
             break;
         case LOC.SETALTCH:
             // _debug('Alt Char on');
-            if ('altchar' in callbacks) callbacks.altchar(true);
+            if ('altchar' in callbacks) {
+                callbacks.altchar(true);
+            }
             break;
         case LOC.CLRTEXT:
             _debug('Graphics Mode');
@@ -163,62 +171,88 @@ function Apple2IO(cpu, callbacks)
             callbacks.page(2);
             break;
         case LOC.RDTEXT:
-            if ('isText' in callbacks) 
+            if ('isText' in callbacks) {
                 result = callbacks.isText() ? 0x80 : 0x0;
+            }
             break;
         case LOC.RDMIXED:
-            if ('isMixed' in callbacks) 
+            if ('isMixed' in callbacks) {
                 result = callbacks.isMixed() ? 0x80 : 0x0;
+            }
             break;
         case LOC.RDPAGE2:
-            if ('isPage2' in callbacks) 
+            if ('isPage2' in callbacks) {
                 result = callbacks.isPage2() ? 0x80 : 0x0;
+            }
             break;
         case LOC.RDHIRES:
-            if ('isHires' in callbacks) 
+            if ('isHires' in callbacks) {
                 result = callbacks.isHires() ? 0x80 : 0x0;
+            }
             break;
         case LOC.RD80VID:
-            if ('is80Col' in callbacks) 
+            if ('is80Col' in callbacks) {
                 result = callbacks.is80Col() ? 0x80 : 0x0;
+            }
             break;
         case LOC.RDALTCH:
-            if ('isAltChar' in callbacks) 
+            if ('isAltChar' in callbacks) {
                 result = callbacks.isAltChar() ? 0x80 : 0x0;
+            }
             break;
         case LOC.SETAN0:
             _debug('Annunciator 0 on');
-            if ('annunciator' in callbacks) callbacks.annunicator(0, true);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(0, true);
+            }
             break;
         case LOC.SETAN1:
             _debug('Annunciator 1 on');
-            if ('annunciator' in callbacks) callbacks.annunicator(1, true);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(1, true);
+            }
             break;
         case LOC.SETAN2:
             _debug('Annunciator 2 on');
-            if ('annunciator' in callbacks) callbacks.annunicator(2, true);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(2, true);
+            }
             break;
         case LOC.SETAN3:
             _debug('Annunciator 3 on');
-            if ('annunciator' in callbacks) callbacks.annunicator(3, true);
-            if ('doublehires' in callbacks) callbacks.doublehires(false);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(3, true);
+            }
+            if ('doublehires' in callbacks) {
+                callbacks.doublehires(false);
+            }
             break;
         case LOC.CLRAN0:
             _debug('Annunciator 0 off');
-            if ('annunciator' in callbacks) callbacks.annunicator(0, false);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(0, false);
+            }
             break;
         case LOC.CLRAN1:
             _debug('Annunciator 1 off');
-            if ('annunciator' in callbacks) callbacks.annunicator(1, false);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(1, false);
+            }
             break;
         case LOC.CLRAN2:
             _debug('Annunciator 2 off');
-            if ('annunciator' in callbacks) callbacks.annunicator(2, false);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(2, false);
+            }
             break;
         case LOC.CLRAN3:
             _debug('Annunciator 3 off');
-            if ('annunciator' in callbacks) callbacks.annunicator(3, false);
-            if ('doublehires' in callbacks) callbacks.doublehires(true);
+            if ('annunciator' in callbacks) {
+                callbacks.annunicator(3, false);
+            }
+            if ('doublehires' in callbacks) {
+                callbacks.doublehires(true);
+            }
             break;
         case LOC.SPEAKER:
             _phase = -_phase;
