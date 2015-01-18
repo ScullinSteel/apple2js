@@ -1,8 +1,10 @@
 /*jshint browser: true */
 // var ROM = require('./roms/apple2plus.js');
-var ROM = require('./roms/apple2e.js');
+var ROM = require('./roms/apple2enh.js');
 var AppleII = require('./apple2.js');
-var mapKeyEvent = require('./keyboard2.js').mapKeyEvent;
+var audio = require('./ui/audio.js');
+var gamepad = require('./ui/gamepad.js');
+var KeyBoard = require('./ui/keyboard.js');
 
 var main = new AppleII({
     e: true,
@@ -10,12 +12,16 @@ var main = new AppleII({
     rom: new ROM()
 });
 
-window.onkeydown = function(evt) {
-    var mapped = mapKeyEvent(evt);
-    if (mapped != 0xff) {
-        main.getIO().keyDown(mapped);
-    }
-};
+var io = main.getIO();
 
+// Gamepad Input
+gamepad.initGamepad(io);
+
+// Audio Output
+audio.initAudio(io);
+
+// Keyboard Input
+var keyboard = new KeyBoard(io);
+keyboard.create(document.querySelector('#keyboard'));
 
 module.exports = main;

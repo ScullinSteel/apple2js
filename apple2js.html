@@ -2,76 +2,39 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="css/apple2.css" />
-
     <title>Apple IIjs</title>
-
-    <script type="text/javascript">
-    var _samples = [];
-    var AC = window.webkitAudioContext || window.AudioContext;
-    if (typeof AC != 'undefined') {
-        audioContext = new AC();
-        audioNode = audioContext.createScriptProcessor(4096, 1, 1);
-        
-        audioNode.onaudioprocess = function(event) {
-            var data = event.outputBuffer.getChannelData(0);
-            var sample = _samples.shift();
-            var idx = 0;
-            
-            if (sample) {
-                var len = Math.min(sample.length, data.length);
-                for (; idx < len; idx++) {
-                    data[idx] = sample[idx];
-                }
-            }
-
-            for (; idx < data.length; idx++) { 
-                data[idx] = 0.0;
-            }
-        };
-
-        /*var filter = audioContext.createBiquadFilter();
-        // Create and specify parameters for the low-pass filter.
-        filter.type = 'lowpass';
-        filter.frequency.value = 11000;
-        filter.connect(audioContext.destination);
-        audioNode.connect(filter);
-        */
-        audioNode.connect(audioContext.destination);
-    }
-    </script>
   </head>
-  <body>
+  <body class="apple2e">
     <div style="margin: auto; width: 592px">
       <img id="badge" src="img/badge.png" />
+      <h1 id="subtitle">An Apple ][ Emulator in JavaScript</h1>
       <div class="overscan">
         <canvas width="560" height="384" id="screen" />
       </div>
       <div class="inset">
-        <div style="float: left">
-          <button onclick="main.reset()">Reset</button>
-        </div>
-        <div style="float: left">
+        <div style="float: left; width: 50%">
           <div class="disk" id="disk1">&nbsp;</div>
           <span id="disklabel1" class="disklabel">Disk 1</span>
         </div>
-        <div style="float: left">
+        <div style="float: left; width: 50%">
           <div class="disk" id="disk2">&nbsp;</div>
           <span id="disklabel2" class="disklabel">Disk 2</span>
         </div>
         <div style="clear: both"></div>
       </div>
+      <div class="inset" style="position: relative">
+        <button onclick="main.reset()" id="reset">
+          RESET
+        </button>
+        <div style="clear: both"></div>
+      </div>
+      <div id="keyboard">
+      </div>
     </div>
-    <script type="text/javascript" src="dist/module.min.js"></script>
+    <script type="text/javascript" src="dist/module.js"></script>
     <script type="text/javascript">
     var main = require('./js/main.js');
-    var io = main.getIO();
     var disk2 = main.getDiskII();
-    if (audioContext) {
-        io.sampleRate(audioContext.sampleRate);
-        io.addSampleListener(function(sample) {
-            _samples.push(sample);
-        });
-    }
 
     disk2.addDriveLightListener(function(drive, on) {
         var disk = document.getElementById('disk' + drive);

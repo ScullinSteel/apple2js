@@ -1,5 +1,5 @@
 /* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2014 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -10,14 +10,18 @@
  * implied warranty.
  */
 
-/*jshint jquery: true, browser: true */
-/*globals flipX: false, flipY: false */
-/*exported processGamepad, initGamepad, gamepad */
+/*jshint browser: true*/
+
+var Util = require('../util.js');
+var each = Util.each;
 
 var gamepadSupportAvailable = !!navigator.webkitGetGamepads;
 var gamepad;
 var gamepadMap = [];
 var gamepadState = [];
+
+var flipX = false;
+var flipY = false;
 
 var BUTTON = {
     // Buttons
@@ -54,7 +58,7 @@ var DEFAULT_GAMEPAD = {
     'START': '\033'
 };
 
-window.addEventListener("gamepadconnected", function(e) {
+window.addEventListener('gamepadconnected', function(e) {
     gamepad = e.gamepad;
 });
 
@@ -74,7 +78,7 @@ function processGamepad(io) {
                 var old = gamepadState[idx];
                 var button = gamepad.buttons[idx];
                 var pressed;
-                if (typeof(button) == "object") {
+                if (typeof(button) == 'object') {
                     pressed = button.pressed;
                 } else {
                     pressed = (button == 1.0);
@@ -99,23 +103,33 @@ function processGamepad(io) {
     }
 }
 
-function initGamepad(data) {
-    for (var idx = 0; idx < 16; idx++) {
-        gamepadMap[idx] = undefined;
+module.exports = {
+    initGamepad: function initGamepad(io) {
+        if (gamepadSupportAvailable) {
+            setInterval(function() {
+                processGamepad(io);
+            }, 100);
+        }
+    },
+
+    updateGamepadMap: function updateGamepadMap(data) {
+        for (var idx = 0; idx < 16; idx++) {
+            gamepadMap[idx] = undefined;
+        }
+        var map = data || DEFAULT_GAMEPAD;
+        each(map, function(key, val) {
+            if (typeof val == 'string') {
+                val = val.charCodeAt(0);
+            } else {
+                val = -val;
+            }
+            if (key in BUTTON) {
+                gamepadMap[BUTTON[key]] = val;
+            } else {
+                gamepadMap[parseInt(key, 10)] = val;
+            }
+        });
     }
-    var map = data || DEFAULT_GAMEPAD;
-    $.each(map, function(key, val) {
-        if (typeof val == 'string') {
-            val = val.charCodeAt(0);
-        } else {
-            val = -val;
-        }
-        if (key in BUTTON) {
-            gamepadMap[BUTTON[key]] = val;
-        } else {
-            gamepadMap[parseInt(key, 10)] = val;
-        }
-    });
-}
+};
 
 

@@ -10,9 +10,11 @@
  * implied warranty.
  */
 
-/*jshint jquery: true, browser: true */
-/*globals debug: false, toHex: false */
-/*exported KeyBoard */
+/*jshint browser:true */
+
+var Util = require('../util.js');
+var debug = Util.debug;
+var toHex = Util.toHex;
 
 function KeyBoard(io) {
     // keycode: [plain, cntl, shift]
@@ -119,7 +121,7 @@ function KeyBoard(io) {
         0x5B: [0xFF, 0xFF, 0xFF], // Left window
         0x5C: [0xFF, 0xFF, 0xFF], // Right window
         0x5D: [0xFF, 0xFF, 0xFF], // Select
-        0x5E: [0x5E, 0x1E, 0x5E], // 
+        0x5E: [0x5E, 0x1E, 0x5E], //
         0x5F: [0x5F, 0x1F, 0x5F], // _
 
         // Numeric pad
@@ -162,7 +164,7 @@ function KeyBoard(io) {
           ['CTRL','A','S','D','F','G','H','J','K','L',';','\'','RETURN'],
           ['SHIFT','Z','X','C','V','B','N','M',',','.','/','SHIFT'],
           ['LOCK','`','POW','OPEN_APPLE','&nbsp;','CLOSED_APPLE','&larr;','&rarr;','&darr;','&uarr;']],
-         [['ESC','!','@','#','$','%','^','&',"*",'(',')','_','+','DELETE'],
+         [['ESC','!','@','#','$','%','^','&','*','(',')','_','+','DELETE'],
           ['TAB','Q','W','E','R','T','Y','U','I','O','P','{','}','|'],
           ['CTRL','A','S','D','F','G','H','J','K','L',':','"','RETURN'],
           ['SHIFT','Z','X','C','V','B','N','M','<','>','?','SHIFT'],
@@ -174,16 +176,23 @@ function KeyBoard(io) {
     var optioned = false;
     var commanded = false;
 
+    var shiftKeys;
+    var controlKey;
+    var commandKey;
+    var optionKey;
+    var lockKey;
+
     return {
         mapKeyEvent: function keyboard_mapKeyEvent(evt) {
-            var code = evt.keyCode, key = 0xff;
+            var code = evt.keyCode, key = 0xFF;
             
             if (code in keymap) {
                 key = keymap[code][evt.shiftKey ? 2 : (evt.ctrlKey ? 1 : 0)];
-                if (capslocked && key >= 0x61 && key <= 0x7A)
+                if (capslocked && key >= 0x61 && key <= 0x7A) {
                     key -= 0x20;
+                }
             } else {
-                debug("Unhandled key = " + toHex(code));
+                debug('Unhandled key = ' + toHex(code));
             }
             
             return key;
@@ -193,19 +202,21 @@ function KeyBoard(io) {
             shifted = down;
             if (down) {
                 io.buttonDown(2);
-                $("#keyboard .key-SHIFT").addClass("active");
+                shiftKeys[0].classList.add('active');
+                shiftKeys[1].classList.add('active');
             } else {
                 io.buttonUp(2);
-                $("#keyboard .key-SHIFT").removeClass("active");
+                shiftKeys[0].classList.remove('active');
+                shiftKeys[1].classList.remove('active');
             }
         },
 
         controlKey: function keyboard_controlKey(down) {
             controlled = down;
             if (down) {
-                $("#keyboard .key-CTRL").addClass("active");
+                controlKey.classList.add('active');
             } else {
-                $("#keyboard .key-CTRL").removeClass("active");
+                controlKey.classList.remove('active');
             }
         },
 
@@ -213,10 +224,10 @@ function KeyBoard(io) {
             commanded = down;
             if (down) {
                 io.buttonDown(0);
-                $("#keyboard .key-OPEN_APPLE").addClass("active");
+                commandKey.classList.add('active');
             } else {
                 io.buttonUp(0);
-                $("#keyboard .key-OPEN_APPLE").removeClass("active");
+                commandKey.classList.remove('active');
             }
         },
 
@@ -224,72 +235,73 @@ function KeyBoard(io) {
             optioned = down;
             if (down) {
                 io.buttonDown(1);
-                $("#keyboard .key-CLOSED_APPLE").addClass("active");
+                optionKey.classList.add('active');
             } else {
                 io.buttonUp(1);
-                $("#keyboard .key-CLOSED_APPLE").removeClass("active");
+                optionKey.classList.remove('active');
             }
         },
 
         capslockKey: function keyboard_caplockKey(down) {
             capslocked = down;
             if (down) {
-                $("#keyboard .key-LOCK").addClass("active");
+                lockKey.classList.add('active');
             } else {
-                $("#keyboard .key-LOCK").removeClass("active");
+                lockKey.classList.remove('active');
             }
-
         },
 
-        create: function keyboard_create(kb) {
+        create: function keyboard_create(keyboard) {
             var x, y, row, key, key1, key2, label, label1, label2, self = this;
             
-            kb.disableSelection();
+            keyboard.classList.add('noselect');
 
             function buildLabel(k) {
-                var span = $("<span>" + k + "</span>");
-                if (k.length > 1 && k.substr(0,1) != '&')
-                    span.addClass("small");
+                var span = document.createElement('span');
+                span.innerHTML = k;
+                if (k.length > 1 && k.substr(0,1) != '&') {
+                    span.classList.add('small');
+                }
                 return span;
             }
 
-            function _mouseup(ev) {
-                $(ev.currentTarget).removeClass("pressed");
+            function _mouseup(evt) {
+                evt.currentTarget.classList.remove('pressed');
             }
 
-            function _mousedown(ev) {
-                $(this).addClass("pressed");
-                var key = $(ev.currentTarget).data(shifted ? "key2" : "key1");
+            function _mousedown(evt) {
+                this.classList.add('pressed');
+                var key = evt.currentTarget.dataset[shifted ? 'key2' : 'key1'];
                 switch (key) {
-                case "BELL":
-                    key = "G";
+                case 'BELL':
+                    key = 'G';
                     break;
-                case "RETURN":
-                    key = "\r";
+                case 'RETURN':
+                    key = '\r';
                     break;
-                case "TAB":
-                    key = "\t";
+                case 'TAB':
+                    key = '\t';
                     break;
-                case "DELETE":
-                    key = "\0177";
+                case 'DELETE':
+                    key = '\0177';
                     break;
-                case "&larr;":
-                    key = "\010";
+                case '&larr;':
+                    key = '\010';
                     break;
-                case "&rarr;":
-                    key = "\025";
+                case '&rarr;':
+                    key = '\025';
                     break;
-                case "&darr;":
-                    key = "\012";
+                case '&darr;':
+                    key = '\012';
                     break;
-                case "&uarr;":
-                    key = "\013";
+                case '&uarr;':
+                    key = '\013';
                     break;
-                case "&nbsp;":
-                    key = " ";
+                case '&nbsp;':
+                    key = ' ';
                     break;
-                case "ESC":
-                    key = "\033";
+                case 'ESC':
+                    key = '\033';
                     break;
                 default:
                     break;
@@ -297,31 +309,31 @@ function KeyBoard(io) {
                 
                 if (key.length > 1) {
                     switch (key) {
-                    case "SHIFT":
+                    case 'SHIFT':
                         self.shiftKey(!shifted);
                         break;
-                    case "CTRL":
+                    case 'CTRL':
                         self.controlKey(!controlled);
                         break;
-                    case "CAPS":
-                    case "LOCK":
+                    case 'CAPS':
+                    case 'LOCK':
                         self.capslockKey(!capslocked);
                         break;
-                    case "POW":
-                        if (window.confirm("Power Cycle?"))
+                    case 'POW':
+                        if (window.confirm('Power Cycle?'))
                             window.location.reload();
                         break;
-                    case "OPEN_APPLE":
+                    case 'OPEN_APPLE':
                         self.commandKey(!commanded);
                         break;
-                    case "CLOSED_APPLE":
+                    case 'CLOSED_APPLE':
                         self.optionKey(!optioned);
                         break;
                     default:
                         break;
                     }
                 } else {
-                    if (controlled && key >= "@" && key <= "_") {
+                    if (controlled && key >= '@' && key <= '_') {
                         io.keyDown(key.charCodeAt(0) - 0x40);
                     } else if (!shifted && !capslocked && 
                                key >= 'A' && key <= 'Z') {
@@ -333,51 +345,95 @@ function KeyBoard(io) {
             }
 
             for (y = 0; y < 5; y++) {
-                row = $("<div class='row row" + y + "e'/>");
-                kb.append(row);
+                row = document.createElement('div');
+                row.classList.add('row');
+                row.classList.add('row' + y);
+                keyboard.appendChild(row);
+
                 for (x = 0; x < keys[0][y].length; x++) {
                     key1 = keys[0][y][x];
                     key2 = keys[1][y][x];
 
-                    label = $("<div />");
+                    label = document.createElement('div');
                     label1 = buildLabel(key1);
                     label2 = buildLabel(key2);
 
-                    key = $("<div class='key'>");
-                    key.addClass("key-" + key1.replace(/[&#;]/g,""));
+                    key = document.createElement('div');
+                    key.classList.add('key');
+                    key.classList.add('key-' + key1.replace(/[&#;]/g,''));
 
                     if (key1.length > 1) {
-                        if (key1 == "LOCK")
-                            key.addClass("vcenter2");
+                        if (key1 == 'LOCK')
+                            key.classList.add('vcenter2');
                         else
-                            key.addClass("vcenter");
+                            key.classList.add('vcenter');
                     }
                     if (key1 != key2) {
-                        key.addClass("key-" + key2.replace(/[&;]/g,""));
-                        label.append(label2);
-                        label.append("<br/>");
+                        key.classList.add('key-' + key2.replace(/[&;]/g,''));
+                        label.appendChild(label2);
+                        label.appendChild(document.createElement('br'));
                     }
-                    if (key1 == "LOCK")
-                        key.addClass("active");
+                    if (key1 == 'LOCK') {
+                        key.classList.add('active');
+                    }
 
-                    label.append(label1);
-                    key.append(label);
-                    key.data({"key1": key1, "key2": key2});
+                    label.appendChild(label1);
+                    key.appendChild(label);
+                    key.dataset.key1 = key1;
+                    key.dataset.key2 = key2;
 
                     if (window.ontouchstart === undefined) {
-                        key.bind("mousedown", _mousedown);
-                        key.bind("mouseup mouseout", _mouseup);
+                        key.addEventListener('mousedown', _mousedown);
+                        key.addEventListener('mouseup', _mouseup);
+                        key.addEventListener('mouseout', _mouseup);
                     } else {
-                        key.bind("touchstart", _mousedown);
-                        key.bind("touchend touchleave", _mouseup);
+                        key.addEventListener('touchstart', _mousedown);
+                        key.addEventListener('touchend', _mouseup);
+                        key.addEventListener('touchleave', _mouseup);
                     }
-
-                    row.append(key);
+                    row.appendChild(key);
                 }
-                row.append('<div class="clear" />');
             }
-            kb.append('<div class="clear" />');
+            shiftKeys = keyboard.querySelectorAll('.key-SHIFT');
+            controlKey = keyboard.querySelector('.key-CTRL');
+            commandKey = keyboard.querySelector('.key-OPEN_APPLE');
+            optionKey = keyboard.querySelector('.key-CLOSED_APPLE');
+            lockKey = keyboard.querySelector('.key-CAPS');
+
+            window.addEventListener('keydown', function(evt) {
+                if (evt.keyCode == 16) { // Shift
+                    self.shiftKey(true);
+                } else if (evt.keyCode == 17) { // Control
+                    self.controlKey(true);
+                } else if (evt.keyCode == 91 || evt.keyCode == 93) { // Command
+                    self.commandKey(true);
+                } else if (evt.keyCode == 18) { // Alt
+                    self.optionKey(true);
+                } else {
+                    // Keyboard Input
+                    var mapped = self.mapKeyEvent(evt);
+                    if (mapped != 0xff) {
+                        io.keyDown(mapped);
+                    }
+                }
+                evt.preventDefault();
+                return false;
+            });
+            window.addEventListener('keyup', function(evt) {
+                if (evt.keyCode == 16) { // Shift
+                    self.shiftKey(false);
+                } else if (evt.keyCode == 17) { // Control
+                    self.controlKey(false);
+                } else if (evt.keyCode == 91 || evt.keyCode == 93) { // Command
+                    self.commandKey(false);
+                } else if (evt.keyCode == 18) { // Alt
+                    self.optionKey(false);
+                }
+                evt.preventDefault();
+                return false;
+            });
         }
     };
 }
 
+module.exports = KeyBoard;

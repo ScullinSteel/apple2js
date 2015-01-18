@@ -1,17 +1,11 @@
 /* Copyright 2010-2013 Will Scullin */
 
-.disklabel {
-    color: #000;
-    font-weight: bold;
-}
-
 img {
     border: none;
 }
 
 img#badge {
-    padding: 0px 12px;
-    cursor: pointer;
+    padding-left: 6px;
 }
 
 h1#subtitle {
@@ -23,24 +17,10 @@ h1#subtitle {
     font-weight: normal;
 }
 
-.motter {
-    font-family: "Motter Tektura";
-    font-size: 12px;
-}
-
-input[type="button"] {
-    width: 75px;
-}
-
-input[type="text"] {
-    width: 40px;
-}
-
 body {
     margin: 16px 0px;
     font-size: 10px;
     background-color: #c4c1a0; /* Pantone 453 */
-    color: #fff;
 }
 
 #display {
@@ -58,11 +38,6 @@ body {
     border-radius: 10px;
 }
 
-#power {
-    padding: 2px;
-    border: 1px inset #888;
-}
-
 .disk {
     margin: 5px;
     float: left;
@@ -72,12 +47,9 @@ body {
 }
 
 .disklabel {
-    font-size: 11px;
-    font-family: sans-serif;
-}
-
-.disksave {
-    display: none;
+    color: #000;
+    font: bold 14px sans-serif;
+    line-height: 26px;
 }
 
 .code {
@@ -86,43 +58,12 @@ body {
     white-space: pre;
 }
 
-table.debug_page {
-    padding: 0px;
-    font-family: Courier;
-    font-size: 10px;
-    border-collapse: collapse;
-}
-
-th {
-    background-color: #ccc;
-}
-
 .inset {
     width: 594px;
     border-radius: 6px;
     border: 3px inset #f0edd0;
     padding: 6px;
     margin: 10px 0px;
-}
-
-#speed {
-    margin: 9px 0px;
-    width: 200px;
-}
-
-#khz {
-    margin-right: 4px;
-    padding: 4px;
-    float: left;
-    font-family: Courier;
-    font-size: 12px;
-    width: 60px;
-    height: 15px;
-    text-align: right;
-    background: #000;
-    color: #0f0;
-    border: 2px inset #888;
-    border-radius: 4px;
 }
 
 canvas {
@@ -218,34 +159,6 @@ canvas {
     height: 384px;
 }
 
-#page1 {
-    visibility: display;
-}
-
-#page2 {
-    visibility: hidden;
-}
-
-#about iframe {
-    border: 1px inset #666;
-    width: 99%;
-    height: 99%;
-}
-
-#about {
-    padding: 16px;
-    margin: 0px;
-    font-family: "Adobe Garamond Pro",Garamond,Times;
-    font-size: 14px;
-    background-color: #fff;
-    color: #000;
-}
-
-#about a {
-    background-color: #fff;
-    color: #000;
-}
-
 #load select {
     width: 250px;
     height: 300px;
@@ -262,6 +175,19 @@ canvas {
 
 .apple2e #keyboard .row {
     width: 610px;
+}
+
+#reset {
+    width: 42px;
+    height: 42px;
+    float: right;
+    padding: 0px;
+    margin: 0px;
+    border-radius: 6px;
+    border: 5px outset #66594E;
+    color: white;
+    background-color: #44372C;
+    font: 9px sans-serif;
 }
 
 #keyboard {
@@ -393,7 +319,7 @@ canvas {
 }
 
 .apple2e .inset {
-    width: 604px;
+    width: 99%;
 }
 
 .apple2e #keyboard .key-CTRL {
@@ -461,4 +387,13 @@ canvas {
 
 #keyboard .key-CLOSED_APPLE span {
     display: none;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

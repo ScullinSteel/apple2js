@@ -35,12 +35,13 @@ function AppleII(options) {
         }
         
         var ival = 30;
+        var stepMax = kHz * ival * 1.25;
         
         var now, last = Date.now();
         var runFn = function() { 
             now = Date.now();
 
-            var step = (now - last) * kHz, stepMax = kHz * ival;
+            var step = (now - last) * kHz;
             last = now;
             if (step > stepMax) {
                 step = stepMax;

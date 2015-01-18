@@ -1,8 +1,5 @@
 /* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
-/*global bytify:false */
-/*exported Apple2eEnhancedROM */
-
 function Apple2eEnhancedROM()
 {
     var rom = [
@@ -2056,8 +2053,6 @@ function Apple2eEnhancedROM()
         0xf5,0x03,0xfb,0x03,0x62,0xfa,0xfa,0xc3
     ];
 
-    rom = bytify(rom);
-
     return {
         start: function apple2e_start() {
             return 0xc1;
@@ -2074,3 +2069,5 @@ function Apple2eEnhancedROM()
         setState: function() {}
     };
 }
+
+module.exports = Apple2eEnhancedROM;

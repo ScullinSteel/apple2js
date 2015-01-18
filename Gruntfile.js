@@ -11,7 +11,11 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            files: ['Gruntfile.js', 'js/*.js'],
+            files: [
+                'Gruntfile.js',
+                'js/*.js',
+                'js/ui/*.js'
+            ],
             options: {
                 forin: true,
                 funcscope: true,
