@@ -326,6 +326,9 @@ function LoresPage(page)
             _refreshing = false;
         },
         blink: function() {
+            if (pageMode != _page) {
+                return;
+            }
             var addr = 0x400 * _page;
             _refreshing = true; 
             _blink = !_blink;

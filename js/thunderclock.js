@@ -10,8 +10,8 @@
  * implied warranty.
  */
 
-/*exported Thunderclock */
-/*global each */
+var Util = require('./util.js');
+var each = Util.each;
 
 function Thunderclock(mmu, io, slot)
 {
@@ -391,3 +391,4 @@ function Thunderclock(mmu, io, slot)
     };
 }
 
+module.exports = Thunderclock;

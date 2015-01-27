@@ -10,6 +10,7 @@ var Slot3 = require('./slot3.js');
 var DiskII = require('./disk2.js');
 var LanguageCard = require('./langcard.js');
 var MMU = require('./mmu.js');
+var Thunderclock = require('./thunderclock.js');
 
 var kHz = 1023;
 var runTimer;
@@ -83,6 +84,8 @@ function AppleII(options) {
         lc = new LanguageCard(io, options.rom);
     }
 
+    var thunderclock = new Thunderclock(mmu, io, 7);
+
     if (!options.e) {
         var ram1 = new RAM(0x00, 0x04);
         var ram2 = new RAM(0x0C, 0x1F);
@@ -102,11 +105,13 @@ function AppleII(options) {
         var slot3 = new Slot3(mmu, options.rom);
         mmu.addSlot(3, slot3);
         mmu.addSlot(6, disk2);
+        mmu.addSlot(7, thunderclock);
 
         cpu.addPageHandler(mmu);
     } else {
         cpu.addPageHandler(lc);
         cpu.addPageHandler(disk2);
+        cpu.addPageHandler(thunderclock);
     }
 
     var screen = options.screenCanvas;

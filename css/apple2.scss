@@ -1,4 +1,4 @@
-/* Copyright 2010-2013 Will Scullin */
+/* Copyright 2010-2015 Will Scullin */
 
 img {
     border: none;
@@ -6,15 +6,6 @@ img {
 
 img#badge {
     padding-left: 6px;
-}
-
-h1#subtitle {
-    margin: 0px;
-    padding: 3px 0px 0px 10px;
-    color: black;
-    font-family: "Adobe Garamond Pro",Garamond,Times;
-    font-size: 13px;
-    font-weight: normal;
 }
 
 body {
@@ -41,7 +32,7 @@ body {
 .disk {
     margin: 5px;
     float: left;
-    background-image: url(red-off-16.png);
+    background-image: url(img/red-off-16.png);
     width: 16px;
     height: 16px;
 }
@@ -59,11 +50,11 @@ body {
 }
 
 .inset {
-    width: 594px;
+    width: 584px;
     border-radius: 6px;
     border: 3px inset #f0edd0;
     padding: 6px;
-    margin: 10px 0px;
+    margin: 6px 0px;
 }
 
 canvas {
@@ -166,7 +157,6 @@ canvas {
 
 #keyboard .row {
     display: block;
-    margin: 0px;
     padding: 0px;
     height: 42px;
     font-family: Helvetica;
@@ -182,7 +172,7 @@ canvas {
     height: 42px;
     float: right;
     padding: 0px;
-    margin: 0px;
+    margin: 0px 0px 4px 0px;
     border-radius: 3px;
     border: 3px outset #66594E;
     color: white;
@@ -323,10 +313,6 @@ canvas {
     margin: 5px;
 }
 
-.apple2e .inset {
-    width: 99%;
-}
-
 .apple2e #keyboard .key-CTRL {
     width: 60px;
 }
@@ -363,7 +349,7 @@ canvas {
 }
 
 #keyboard .key-OPEN_APPLE div {
-    background-image: url(../img/open-apple24.png);
+    background-image: url(img/open-apple24.png);
     width: 24px;
     height: 24px;
     bottom: 1px;
@@ -375,11 +361,11 @@ canvas {
 }
 
 #keyboard .key-OPEN_APPLE.active div {
-    background-image: url(../img/open-apple24-green.png);
+    background-image: url(img/open-apple24-green.png);
 }
 
 #keyboard .key-CLOSED_APPLE div {
-    background-image: url(../img/closed-apple24.png);
+    background-image: url(img/closed-apple24.png);
     width: 24px;
     height: 24px;
     bottom: 1px;
@@ -387,7 +373,7 @@ canvas {
 }
 
 #keyboard .key-CLOSED_APPLE.active div {
-    background-image: url(../img/closed-apple24-green.png);
+    background-image: url(img/closed-apple24-green.png);
 }
 
 #keyboard .key-CLOSED_APPLE span {

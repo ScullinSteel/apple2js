@@ -720,6 +720,7 @@ function DiskII(io, slot)
             }
             cur.tracks = tracks;
             _updateDirty(_drive, false);
+            return true;
         },
         getJSON: function disk2_getJSON(drive, pretty) {
             return _json_encode(drive, pretty);
