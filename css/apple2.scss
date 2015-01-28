@@ -8,6 +8,15 @@ img#badge {
     padding-left: 6px;
 }
 
+h1#subtitle {
+    margin: 0px;
+    padding: 3px 0px 0px 10px;
+    color: black;
+    font-family: "Adobe Garamond Pro",Garamond,Times;
+    font-size: 13px;
+    font-weight: normal;
+}
+
 body {
     margin: 16px 0px;
     font-size: 10px;
@@ -32,7 +41,7 @@ body {
 .disk {
     margin: 5px;
     float: left;
-    background-image: url(img/red-off-16.png);
+    background-image: url(../img/red-off-16.png);
     width: 16px;
     height: 16px;
 }
@@ -349,7 +358,7 @@ canvas {
 }
 
 #keyboard .key-OPEN_APPLE div {
-    background-image: url(img/open-apple24.png);
+    background-image: url(../img/open-apple24.png);
     width: 24px;
     height: 24px;
     bottom: 1px;
@@ -361,11 +370,11 @@ canvas {
 }
 
 #keyboard .key-OPEN_APPLE.active div {
-    background-image: url(img/open-apple24-green.png);
+    background-image: url(../img/open-apple24-green.png);
 }
 
 #keyboard .key-CLOSED_APPLE div {
-    background-image: url(img/closed-apple24.png);
+    background-image: url(../img/closed-apple24.png);
     width: 24px;
     height: 24px;
     bottom: 1px;
@@ -373,7 +382,7 @@ canvas {
 }
 
 #keyboard .key-CLOSED_APPLE.active div {
-    background-image: url(img/closed-apple24-green.png);
+    background-image: url(../img/closed-apple24-green.png);
 }
 
 #keyboard .key-CLOSED_APPLE span {
