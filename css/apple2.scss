@@ -78,77 +78,11 @@ canvas {
     image-rendering: optimize-contrast;
 }
 
-@media all and (device-width: 320px) {
-    canvas {
-	width: 537px;
-	height: 368px;
-	left: 30px;
-	top: 24px;
-    }
-    #scanlines: {
-	width: 537px;
-	height: 368px;
-	left: 30px;
-	top: 24px;
-    }
-}
-
-@media all and (device-width: 768px) {
-    canvas {
-	width: 564px;
-	height: 386px;
-	left: 14px;
-	top: 15px;
-    }
-    #scanlines {
-	width: 564px;
-	height: 386px;
-	left: 14px;
-	top: 15px;
-    }
-}
-
 :-webkit-full-screen {
     width: 100%;
     height: 100%;
 }
-/*
-@media screen and (min-device-width:1120px) {
-:-webkit-full-screen { 
-    background: #000;
-}
 
-:-moz-full-screen .overscan {
-    border: 0px none !important; 
-    width: 1120px;
-    height: 768px;
-    margin: auto;
-}
-:-webkit-full-screen .overscan {
-    border: 0px none !important;
-    width: 1120px;
-    height: 768px;
-}
-
-:-moz-full-screen canvas {
-    width: 1120px;
-    height: 768px;
-}
-:-webkit-full-screen canvas {
-    width: 1120px;
-    height: 768px;
-}
-
-:-webkit-full-screen #scanlines {
-    width: 1120px;
-    height: 768px;
-}
-:-moz-full-screen #scanlines {
-    width: 1120px;
-    height: 768px;
-}
-}
-*/
 #scanlines {
     position: absolute;
     top: 16px;
