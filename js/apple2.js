@@ -126,8 +126,8 @@ function AppleII(options) {
         run: function() {
         },
 
-        reset: function() {
-            cpu.reset();
+        getCPU: function () {
+            return cpu;
         },
 
         getDiskII: function getDiskII() {
