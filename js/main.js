@@ -1,5 +1,5 @@
 /*jshint browser: true */
-// var ROM = require('./roms/apple2plus.js');
+//var ROM = require('./roms/apple2.js');
 var ROM = require('./roms/apple2enh.js');
 var AppleII = require('./apple2.js');
 var audio = require('./ui/audio.js');

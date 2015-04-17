@@ -31,7 +31,10 @@ module.exports = function(grunt) {
             dist: {
                 files: [
                     {
-                        src: ['json/**','img/**'],
+                        src: [
+                            'json/**',
+                            'img/**'
+                        ],
                         dest: 'dist/'
                     },
                     {
@@ -39,6 +42,12 @@ module.exports = function(grunt) {
                         dest: 'dist/',
                         expand: true,
                         flatten: true
+                    },
+                    {
+                        cwd: 'node_modules/bootstrap/dist/',
+                        src: '**/*',
+                        dest: 'dist/',
+                        expand: true
                     }
                 ]
             }
@@ -78,9 +87,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     
     grunt.registerTask('default', [
-        'copy',
+        'clean',
         'jshint',
         'sass',
         'browserify',
-        'uglify']);  
+        'uglify',
+        'copy']);
 };
