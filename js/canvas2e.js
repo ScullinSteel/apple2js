@@ -10,9 +10,9 @@
  * implied warranty.
  */
 
-var Util = require('./util.js');
-var charset = require('./charroms/apple2echar.js').charset;
-var Base64 = require('./base64.js');
+var Util = require('./util');
+var charset = require('./charroms/apple2echar').charset;
+var Base64 = require('./base64');
 
 var allocMemPages = Util.allocMemPages;
 var base64_decode = Base64.decode;

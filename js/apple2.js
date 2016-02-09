@@ -1,16 +1,14 @@
-/*jshint node:true, browser: true */
-
-// var Util = require('./util.js');
-var CPU6502 = require('./cpu6502.js');
-var RAM = require('./ram.js');
-var canvas2 = require('./canvas2.js');
-var canvas2e = require('./canvas2e.js');
-var Apple2IO = require('./apple2io.js');
-var Slot3 = require('./slot3.js');
-var DiskII = require('./disk2.js');
-var LanguageCard = require('./langcard.js');
-var MMU = require('./mmu.js');
-var Thunderclock = require('./thunderclock.js');
+/*jshint browser: true */
+var CPU6502 = require('cpu6502');
+var RAM = require('./ram');
+var canvas2 = require('./canvas2');
+var canvas2e = require('./canvas2e');
+var Apple2IO = require('./apple2io');
+var Slot3 = require('./slot3');
+var DiskII = require('./disk2');
+var LanguageCard = require('./langcard');
+var MMU = require('./mmu');
+var Thunderclock = require('./thunderclock');
 
 var kHz = 1023;
 var runTimer;

@@ -10,23 +10,20 @@
   <body class="apple2e">
     <div style="margin: auto; width: 602px">
       <img id="badge" src="img/badge.png" />
-      <h1 id="subtitle">An Apple ][ Emulator in JavaScript</h1>
+      <h1 id="subtitle">An Apple //e Emulator in JavaScript</h1>
       <div class="overscan">
         <canvas width="560" height="384" id="screen" />
       </div>
-      <div class="inset">
-        <div style="float: left; width: 50%">
-          <div class="disk" id="disk1">&nbsp;</div>
-          <span id="disklabel1" class="disklabel">Disk 1</span>
+      <div class="inset drives">
+        <div class="drive">
+          <div class="light" id="disk1">&nbsp;</div>
+          <span id="disklabel1" class="label">Disk 1</span>
         </div>
-        <div style="float: left; width: 50%">
-          <div class="disk" id="disk2">&nbsp;</div>
-          <span id="disklabel2" class="disklabel">Disk 2</span>
+        <div class="drive">
+          <div class="light" id="disk2">&nbsp;</div>
+          <span id="disklabel2" class="label">Disk 2</span>
         </div>
-        <div style="clear: both"></div>
-      </div>
-      <div>
-        <button onclick="cpu.reset()" id="reset">
+        <button onclick="cpu.reset()" id="reset" class="noselect">
           RESET
         </button>
         <div style="clear: both"></div>

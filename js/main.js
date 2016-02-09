@@ -1,10 +1,10 @@
 /*jshint browser: true */
-//var ROM = require('./roms/apple2.js');
-var ROM = require('./roms/apple2enh.js');
-var AppleII = require('./apple2.js');
-var audio = require('./ui/audio.js');
-var gamepad = require('./ui/gamepad.js');
-var KeyBoard = require('./ui/keyboard.js');
+//var ROM = require('./roms/apple2');
+var ROM = require('./roms/apple2enh');
+var AppleII = require('./apple2');
+var audio = require('./ui/audio');
+var gamepad = require('./ui/gamepad');
+var KeyBoard = require('./ui/keyboard');
 
 var main = new AppleII({
     e: true,

@@ -6,7 +6,8 @@ module.exports = function(grunt) {
                 src: [],
                 dest: './dist/module.js',
                 options: {
-                    require: ['./js/main.js'],
+                    extensions: ['.js'], 
+                    require: ['./js/main.js']
                 } 
             }
         },
@@ -26,6 +27,19 @@ module.exports = function(grunt) {
                 undef: true,
                 unused: true
           }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8000,
+                    base: {
+                        path: 'dist',
+                        options: {
+                            index: 'apple2js.html'
+                        }
+                    }
+                }
+            }
         },
         copy: {
             dist: {
@@ -73,24 +87,44 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['<%= jshint.files %>'],
-            tasks: ['jshint','browserify']
+            scripts: {
+                files: ['<%= jshint.files %>'],
+                tasks: ['jshint','browserify']
+            },
+            html: {
+                files: ['./html/*.html', 'img/*', 'json/*'],
+                tasks: ['copy']
+            },
+            css: {
+                files: ['./css/*.scss'],
+                tasks: ['sass'],
+                options: {
+                    livereload: true,
+                }
+            }
         }
     });
     
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-sass');
     
     grunt.registerTask('default', [
-        'clean',
         'jshint',
         'sass',
         'browserify',
         'uglify',
-        'copy']);
+        'copy'
+    ]);
+
+    grunt.registerTask('dev', [
+        'default',
+        'connect',
+        'watch'
+    ]);
 };

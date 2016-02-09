@@ -10,14 +10,14 @@
  * implied warranty.
  */
 
-var Util = require('./util.js');
-var Base64 = require('./base64.js');
+var Util = require('./util');
+var Base64 = require('./base64');
 
 var allocMem = Util.allocMem;
 var base64_encode = Base64.encode;
 var base64_decode = Base64.decode;
 var bytify = Base64.bytify;
-var each = Base64.each;
+var each = require('lodash/each');
 
 function RAMFactor(mmu, io, slot, size) {
     var rom = [
@@ -1070,7 +1070,7 @@ function RAMFactor(mmu, io, slot, size) {
     };
 
     function _init() {
-        each(LOC, function(key) {
+        each(LOC, function(val, key) {
             LOC[key] += slot * 0x10;
         });
         mem = allocMem(size);

@@ -1,333 +1,339 @@
-/* Copyright 2010-2015 Will Scullin */
+// Copyright 2010-2015 Will Scullin
+
+$black: #000;
+
+$body: #d1cbb5;
+$body-border: #f0edd0;
+
+$power-key-back: #ffd;
+$power-key-green: #4f4;
+
+$key-back: #44372c;
+$key-back-pressed: #22150a;
+$key-border: #66594e;
+$key-border-pressed: #44372c;
+$key-text: #fff;
+$key-active: #4f4;
 
 img {
-    border: none;
+  border: 0;
 }
 
-img#badge {
-    padding-left: 6px;
+#badge {
+  padding-left: 6px;
 }
 
-h1#subtitle {
-    margin: 0px;
-    padding: 3px 0px 0px 10px;
-    color: black;
-    font-family: "Adobe Garamond Pro",Garamond,Times;
-    font-size: 13px;
-    font-weight: normal;
+#subtitle {
+  color: $black;
+  font-family: 'Adobe Garamond Pro', Garamond, Times;
+  font-size: 13px;
+  font-weight: normal;
+  margin: 0;
+  padding: 3px 0 0 10px;
 }
 
 body {
-    margin: 16px 0px;
-    font-size: 10px;
-    background-color: #d1cbb5; /* #c4c1a0 Pantone 453 */
-}
-
-#display {
-    margin: 5px auto;
+  background-color: $body; // #c4c1a0 Pantone 453
+  font-size: 10px;
+  margin: 16px 0;
 }
 
 .overscan {
-    margin: auto;
-    position: relative;
-    background-color: black;
-    padding: 16px;
-    width: 560px;
+  background-color: $black;
+  border: 6px inset $body-border;
+  border-radius: 10px;
+  height: 384px;
+  margin: auto;
+  padding: 16px;
+  width: 560px;
+
+  canvas {
+    cursor: crosshair;
     height: 384px;
-    border: 6px inset #f0edd0;
-    border-radius: 10px;
-}
-
-.disk {
-    margin: 5px;
-    float: left;
-    background-image: url(../img/red-off-16.png);
-    width: 16px;
-    height: 16px;
-}
-
-.disklabel {
-    color: #000;
-    font: bold 14px sans-serif;
-    line-height: 26px;
-}
-
-.code {
-    font-family: Courier;
-    font-size: 14px;
-    white-space: pre;
+    image-rendering: optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    width: 560px;
+  }
 }
 
 .inset {
-    width: 584px;
-    border-radius: 6px;
-    border: 3px inset #f0edd0;
-    padding: 6px;
-    margin: 6px 0px;
-}
+  border: 3px inset $body-border;
+  border-radius: 6px;
+  margin: 6px 0;
+  padding: 6px;
+  width: calc(100% - 18px);
 
-canvas {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    cursor: crosshair;
-    width: 560px;
-    height: 384px;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: optimize-contrast;
+  &.drives {
+    .drive {
+      display: inline-block;
+      padding: 6px;
+      width: 40%;
+
+      .light {
+        background-image: url('../img/red-off-16.png');
+        float: left;
+        height: 16px;
+        margin: 5px;
+        width: 16px;
+      }
+
+      .label {
+        color: $black;
+        font: bold 14px sans-serif;
+        line-height: 26px;
+        text-transform: capitalize;
+      }
+    }
+  }
 }
 
 :-webkit-full-screen {
-    width: 100%;
-    height: 100%;
-}
-
-#scanlines {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    cursor: crosshair;
-    z-index: 1;
-    width: 560px;
-    height: 384px;
-}
-
-#load select {
-    width: 250px;
-    height: 300px;
-}
-
-#keyboard .row {
-    display: block;
-    padding: 0px;
-    height: 42px;
-    font-family: Helvetica;
-    width: 570px;
-}
-
-.apple2e #keyboard .row {
-    width: 610px;
+  height: 100%;
+  width: 100%;
 }
 
 #reset {
-    width: 42px;
-    height: 42px;
-    float: right;
-    padding: 0px;
-    margin: 0px 0px 4px 0px;
-    border-radius: 3px;
-    border: 3px outset #66594E;
-    color: white;
-    background-color: #44372C;
-    font: 9px sans-serif;
-}
+  background-color: $key-back;
+  border: 3px outset $key-border;
+  border-radius: 3px;
+  color: $key-text;
+  float: right;
+  font: 9px sans-serif;
+  height: 42px;
+  padding: 0;
+  width: 42px;
 
-#reset:active {
-    background-color: #22150A;
-    border: 5px outset #44372C;
+  &:active {
+    background-color: $key-back-pressed;
+    border: 3px outset $key-border-pressed;
+  }
 }
 
 #keyboard {
-    margin: 0px 10px;
-}
+  margin: 0 10px;
 
-.apple2e #keyboard {
-    margin: 0px;
-}
-
-#keyboard .row0 {
-    margin-left: 20px;
-}
-
-#keyboard .row2 {
-    margin-left: 10px;
-}
-
-#keyboard .row3 {
-    margin-left: 10px;
-}
-
-#keyboard .row4 {
-    margin-left: 10px;
-}
-
-.apple2e #keyboard .row0 {
-    margin-left: 0px;
-}
-
-.apple2e #keyboard .row2 {
-    margin-left: 0px;
-}
-
-.apple2e #keyboard .row3 {
-    margin-left: 0px;
-}
-
-.apple2e #keyboard .row4 {
-    margin-left: 0px;
-}
-
-#keyboard .key {
+  .row {
     display: block;
-    float: left;
-    margin: 0px;
-    padding: 0px;
-    width: 32px;
-    height: 32px;
-    background-color: #44372C;
-    color: white;
-    vertical-align: bottom;
-    text-align: center;
-    position: relative;
-    border: 5px outset #66594E;
-    border-radius: 5px;
-    cursor: pointer;
-}
+    font-family: Helvetica;
+    padding: 0;
 
-#keyboard .pressed {
-    background-color: #22150A;
-    border: 5px outset #44372C;
-}
+    &.row0 {
+      margin-left: 20px;
+    }
 
-#keyboard .key div {
+    &.row2 {
+      margin-left: 10px;
+    }
+
+    &.row3 {
+      margin-left: 10px;
+    }
+
+    &.row4 {
+      margin-left: 10px;
+    }
+  }
+
+  .key {
+    background-color: $key-back;
+    border: 5px outset $key-border;
     border-radius: 3px;
-    position: absolute;
-    bottom: 0px;
-    width: 100%;
+    color: $key-text;
+    cursor: pointer;
+    display: inline-block;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    position: relative;
     text-align: center;
-}
+    text-transform: uppercase;
+    vertical-align: bottom;
+    width: 32px;
 
-#keyboard .vcenter div {
-    bottom: 10px;
-}
+    &.active {
+      color: $key-active;
+    }
 
-#keyboard .vcenter2 div {
-    bottom: 5px;
-}
+    &.pressed {
+      background-color: $key-back-pressed;
+      border: 5px outset $key-border-pressed;
+    }
 
-#keyboard .key span {
-    font-size: 14px;
-}
+    div {
+      bottom: 1px;
+      width: 100%;
 
-#keyboard .key span.small {
-    font-size: 7px;
-}
+      span {
+        font-size: 14px;
 
-#keyboard .key-SHIFT {
+        &.small {
+          font-size: 7px;
+        }
+      }
+    }    
+  }
+
+  .key-shift {
     width: 53px;
-}
+  }
 
-#keyboard .active {
-    color: #4f4;
-}
-
-#keyboard .key-RETURN {
+  .key-return {
     width: 52px;
-}
+  }
 
-#keyboard .key-DELETE {
+  .key-delete {
     width: 47px;
-}
+  }
 
-#keyboard .key-TAB {
+  .key-tab {
     width: 47px;
-}
+  }
 
-#keyboard .key-POWER {
-    width: 38px;
-    height: 38px;
-    border: 2px groove black;
-    background-color: #ffd;
-    color: black;
+  .key-power {
+    background-color: $power-key-back;
+    border: 2px groove $black;
     border-radius: 2px;
-}
+    color: $black;
+    height: 38px;
+    width: 38px;
 
-#keyboard .key-POWER div {
-    bottom: 15px;
-}
+    div {
+      bottom: 15px;
+    }
+  }
 
-#keyboard .key-nbsp {
+  .key-nbsp {
     margin-left: 62px;
     width: 330px;
-}
+  }
 
-.apple2e table#display {
-    margin: 5px;
-}
-
-.apple2e #keyboard .key-CTRL {
-    width: 60px;
-}
-
-.apple2e #keyboard .key-RETURN {
-    width: 60px;
-}
-
-.apple2e #keyboard .key-SHIFT {
-    width: 81px;
-}
-
-.apple2e #keyboard .key-nbsp {
-    margin-left: 0px;
-    width: 215px;
-}
-
-#keyboard .key-POW {
-    width: 38px;
-    height: 38px;
-    border: 2px groove black;
-    background-color: #ffd;
-    color: black;
+  .key-pow {
+    background-color: $power-key-back;
+    border: 2px groove $black;
     border-radius: 2px;
+    color: $black;
+    height: 38px;
+    width: 38px;
+
+    div {
+      bottom: 15px;
+
+      span {
+        background: $power-key-green;
+        color: $power-key-green;
+      }
+    }
+  }
 }
 
-#keyboard .key-POW div {
-    bottom: 15px;
-}
+.apple2e {
+  #keyboard {
+    margin: 0;
 
-#keyboard .key-POW span {
-    background: #4f4;
-    color: #4f4;
-}
+    .row {
+      width: 610px;
 
-#keyboard .key-OPEN_APPLE div {
-    background-image: url(../img/open-apple24.png);
-    width: 24px;
-    height: 24px;
-    bottom: 1px;
-    left: 4px;
-}
+      &.row0 {
+        margin-left: 0;
+      }
 
-#keyboard .key-OPEN_APPLE span {
-    display: none;
-}
+      &.row2 {
+        margin-left: 0;
+      }
 
-#keyboard .key-OPEN_APPLE.active div {
-    background-image: url(../img/open-apple24-green.png);
-}
+      &.row3 {
+        margin-left: 0;
+      }
 
-#keyboard .key-CLOSED_APPLE div {
-    background-image: url(../img/closed-apple24.png);
-    width: 24px;
-    height: 24px;
-    bottom: 1px;
-    left: 4px;
-}
+      &.row4 {
+        margin-left: 0;
+      }
+    }
 
-#keyboard .key-CLOSED_APPLE.active div {
-    background-image: url(../img/closed-apple24-green.png);
-}
+    .key {
+      div {
+        position: absolute;
+        text-align: center;
+      }
 
-#keyboard .key-CLOSED_APPLE span {
-    display: none;
+      &.vcenter {
+        div {
+          bottom: 10px;
+        }
+      }
+
+      &.vcenter2 {
+        div {
+          bottom: 5px;
+        }
+      }
+
+      &.key-ctrl {
+        width: 60px;
+      }
+
+      &.key-return {
+        width: 60px;
+      }
+
+      &.key-shift {
+        width: 81px;
+      }
+
+      &.key-nbsp {
+        margin-left: 0;
+        width: 215px;
+      }
+
+      &.key-open-apple {
+        div {
+          background-image: url('../img/open-apple24.png');
+          bottom: 1px;
+          height: 24px;
+          left: 4px;
+          width: 24px;
+
+          span {
+            display: none;
+          }
+        }
+      
+        &.active {
+          div {
+            background-image: url('../img/open-apple24-green.png');
+          }
+        }
+      }
+
+      &.key-closed-apple {
+        div {
+          background-image: url('../img/closed-apple24.png');
+          bottom: 1px;
+          height: 24px;
+          left: 4px;
+          width: 24px;
+
+          span {
+            display: none;
+          }
+        }
+
+        &.active {
+          div {
+            background-image: url('../img/closed-apple24-green.png');
+          }
+        }
+      }
+    }
+  }
 }
 
 .noselect {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }

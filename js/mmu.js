@@ -10,12 +10,10 @@
  * implied warranty.
  */
 
-/*jshint node:true */
+var Util = require('./util');
+var RAM = require('./ram');
 
-var Util = require('./util.js');
-var RAM = require('./ram.js');
-
-var debug = Util.debug;
+var debug = require('debug')('apple2js:mmu');
 var toHex = Util.toHex;
 
 function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)

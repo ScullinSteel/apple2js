@@ -12,8 +12,7 @@
 
 /*jshint browser: true*/
 
-var Util = require('../util.js');
-var each = Util.each;
+var each = require('lodash/each');
 
 var gamepadSupportAvailable = !!navigator.webkitGetGamepads;
 var gamepad;
@@ -117,7 +116,7 @@ module.exports = {
             gamepadMap[idx] = undefined;
         }
         var map = data || DEFAULT_GAMEPAD;
-        each(map, function(key, val) {
+        each(map, function(val, key) {
             if (typeof val == 'string') {
                 val = val.charCodeAt(0);
             } else {
@@ -131,5 +130,3 @@ module.exports = {
         });
     }
 };
-
-

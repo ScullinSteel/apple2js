@@ -13,8 +13,8 @@
 var Util = require('./util');
 var events = require('events');
 
-var debug = Util.debug;
-var each = Util.each;
+var debug = require('debug')('apple2js:io');
+var each = require('lodash/each');
 var toHex = Util.toHex;
 
 function Apple2IO(cpu, callbacks)
@@ -93,10 +93,6 @@ function Apple2IO(cpu, callbacks)
         CLRIOUDIS:0x7F  // Disable double hires
     };
     
-    function _debug() {
-        // debug.apply(arguments);
-    }
-
     var _locs = [];
 
     function _tick() {
@@ -117,51 +113,51 @@ function Apple2IO(cpu, callbacks)
         var delta = now - _trigger;
         switch (off) {
         case LOC.CLR80VID:
-            // _debug('80 Column Mode off');
+            // debug('80 Column Mode off');
             if ('_80col' in callbacks) {
                 callbacks._80col(false);
             }
             break;
         case LOC.SET80VID:
-            // _debug('80 Column Mode on');
+            // debug('80 Column Mode on');
             if ('_80col' in callbacks) {
                 callbacks._80col(true);
             }
             break;
         case LOC.CLRALTCH:
-            // _debug('Alt Char off');
+            // debug('Alt Char off');
             if ('altchar' in callbacks) {
                 callbacks.altchar(false);
             }
             break;
         case LOC.SETALTCH:
-            // _debug('Alt Char on');
+            // debug('Alt Char on');
             if ('altchar' in callbacks) {
                 callbacks.altchar(true);
             }
             break;
         case LOC.CLRTEXT:
-            _debug('Graphics Mode');
+            debug('Graphics Mode');
             callbacks.text(false);
             break;
         case LOC.SETTEXT:
-            _debug('Text Mode');
+            debug('Text Mode');
             callbacks.text(true);
             break;
         case LOC.CLRMIXED:
-            _debug('Mixed Mode off');
+            debug('Mixed Mode off');
             callbacks.mixed(false);
             break;
         case LOC.SETMIXED:
-            _debug('Mixed Mode on');
+            debug('Mixed Mode on');
             callbacks.mixed(true);
             break;
         case LOC.CLRHIRES:
-            _debug('LoRes Mode');
+            debug('LoRes Mode');
             callbacks.hires(false);
             break;
         case LOC.SETHIRES:
-            _debug('HiRes Mode');
+            debug('HiRes Mode');
             callbacks.hires(true);
             break;
         case LOC.PAGE1:
@@ -201,25 +197,25 @@ function Apple2IO(cpu, callbacks)
             }
             break;
         case LOC.SETAN0:
-            _debug('Annunciator 0 on');
+            debug('Annunciator 0 on');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(0, true);
             }
             break;
         case LOC.SETAN1:
-            _debug('Annunciator 1 on');
+            debug('Annunciator 1 on');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(1, true);
             }
             break;
         case LOC.SETAN2:
-            _debug('Annunciator 2 on');
+            debug('Annunciator 2 on');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(2, true);
             }
             break;
         case LOC.SETAN3:
-            _debug('Annunciator 3 on');
+            debug('Annunciator 3 on');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(3, true);
             }
@@ -228,25 +224,25 @@ function Apple2IO(cpu, callbacks)
             }
             break;
         case LOC.CLRAN0:
-            _debug('Annunciator 0 off');
+            debug('Annunciator 0 off');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(0, false);
             }
             break;
         case LOC.CLRAN1:
-            _debug('Annunciator 1 off');
+            debug('Annunciator 1 off');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(1, false);
             }
             break;
         case LOC.CLRAN2:
-            _debug('Annunciator 2 off');
+            debug('Annunciator 2 off');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(2, false);
             }
             break;
         case LOC.CLRAN3:
-            _debug('Annunciator 3 off');
+            debug('Annunciator 3 off');
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(3, false);
             }
@@ -334,8 +330,7 @@ function Apple2IO(cpu, callbacks)
     
     return {
         registerSwitches: function apple2io_registerSwitches(a, locs) {
-            each(locs, function(key) {
-                var val = locs[key];
+            each(locs, function(val) {
                 if (_locs[val]) {
                     debug('duplicate switch! ' + toHex(val));
                 }

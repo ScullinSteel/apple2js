@@ -10,8 +10,7 @@
  * implied warranty.
  */
 
-var Util = require('./util.js');
-var each = Util.each;
+var each = require('lodash/each');
 
 function Thunderclock(mmu, io, slot)
 {
@@ -286,7 +285,7 @@ function Thunderclock(mmu, io, slot)
     };
 
     function _init() {
-        each(LOC, function(key) {
+        each(LOC, function(val, key) {
             LOC[key] += slot * 0x10;
         });
     }

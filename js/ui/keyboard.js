@@ -12,8 +12,8 @@
 
 /*jshint browser:true */
 
-var Util = require('../util.js');
-var debug = Util.debug;
+var Util = require('../util');
+var debug = require('debug')('apple2js:keyboard');
 var toHex = Util.toHex;
 
 function KeyBoard(io) {
@@ -159,16 +159,16 @@ function KeyBoard(io) {
     };
 
     var keys = 
-        [[['ESC','1','2','3','4','5','6','7','8','9','0','-','=','DELETE'],
-          ['TAB','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
-          ['CTRL','A','S','D','F','G','H','J','K','L',';','\'','RETURN'],
-          ['SHIFT','Z','X','C','V','B','N','M',',','.','/','SHIFT'],
-          ['LOCK','`','POW','OPEN_APPLE','&nbsp;','CLOSED_APPLE','&larr;','&rarr;','&darr;','&uarr;']],
-         [['ESC','!','@','#','$','%','^','&','*','(',')','_','+','DELETE'],
-          ['TAB','Q','W','E','R','T','Y','U','I','O','P','{','}','|'],
-          ['CTRL','A','S','D','F','G','H','J','K','L',':','"','RETURN'],
-          ['SHIFT','Z','X','C','V','B','N','M','<','>','?','SHIFT'],
-          ['CAPS','~','POW','OPEN_APPLE','&nbsp;','CLOSED_APPLE','&larr;','&rarr;','&darr;','&uarr;']]];
+        [[['esc','1','2','3','4','5','6','7','8','9','0','-','=','delete'],
+          ['tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
+          ['ctrl','A','S','D','F','G','H','J','K','L',';','\'','return'],
+          ['shift','Z','X','C','V','B','N','M',',','.','/','shift'],
+          ['lock','`','pow','open-apple','&nbsp;','closed-apple','&larr;','&rarr;','&darr;','&uarr;']],
+         [['esc','!','@','#','$','%','^','&','*','(',')','_','+','delete'],
+          ['tab','Q','W','E','R','T','Y','U','I','O','P','{','}','|'],
+          ['ctrl','A','S','D','F','G','H','J','K','L',':','"','return'],
+          ['shift','Z','X','C','V','B','N','M','<','>','?','shift'],
+          ['caps','~','pow','open-apple','&nbsp;','closed-apple','&larr;','&rarr;','&darr;','&uarr;']]];
     
     var shifted = false;
     var controlled = false;
@@ -273,16 +273,16 @@ function KeyBoard(io) {
                 this.classList.add('pressed');
                 var key = evt.currentTarget.dataset[shifted ? 'key2' : 'key1'];
                 switch (key) {
-                case 'BELL':
+                case 'bell':
                     key = 'G';
                     break;
-                case 'RETURN':
+                case 'return':
                     key = '\r';
                     break;
-                case 'TAB':
+                case 'tab':
                     key = '\t';
                     break;
-                case 'DELETE':
+                case 'delete':
                     key = '\0177';
                     break;
                 case '&larr;':
@@ -300,7 +300,7 @@ function KeyBoard(io) {
                 case '&nbsp;':
                     key = ' ';
                     break;
-                case 'ESC':
+                case 'esc':
                     key = '\033';
                     break;
                 default:
@@ -309,25 +309,25 @@ function KeyBoard(io) {
                 
                 if (key.length > 1) {
                     switch (key) {
-                    case 'SHIFT':
+                    case 'shift':
                         self.shiftKey(!shifted);
                         break;
-                    case 'CTRL':
+                    case 'ctrl':
                         self.controlKey(!controlled);
                         break;
-                    case 'CAPS':
-                    case 'LOCK':
+                    case 'caps':
+                    case 'lock':
                         self.capslockKey(!capslocked);
                         break;
-                    case 'POW':
+                    case 'pow':
                         if (window.confirm('Power Cycle?')) {
                             window.location.reload();
                         }
                         break;
-                    case 'OPEN_APPLE':
+                    case 'open-apple':
                         self.commandKey(!commanded);
                         break;
-                    case 'CLOSED_APPLE':
+                    case 'closed-apple':
                         self.optionKey(!optioned);
                         break;
                     default:
@@ -364,7 +364,7 @@ function KeyBoard(io) {
                     key.classList.add('key-' + key1.replace(/[&#;]/g,''));
 
                     if (key1.length > 1) {
-                        if (key1 == 'LOCK') {
+                        if (key1 == 'lock') {
                             key.classList.add('vcenter2');
                         } else if (key1.substr(0,1) != '&') {
                             key.classList.add('vcenter');
@@ -375,7 +375,7 @@ function KeyBoard(io) {
                         label.appendChild(label2);
                         label.appendChild(document.createElement('br'));
                     }
-                    if (key1 == 'LOCK') {
+                    if (key1 == 'lock') {
                         key.classList.add('active');
                     }
 
@@ -396,11 +396,11 @@ function KeyBoard(io) {
                     row.appendChild(key);
                 }
             }
-            shiftKeys = keyboard.querySelectorAll('.key-SHIFT');
-            controlKey = keyboard.querySelector('.key-CTRL');
-            commandKey = keyboard.querySelector('.key-OPEN_APPLE');
-            optionKey = keyboard.querySelector('.key-CLOSED_APPLE');
-            lockKey = keyboard.querySelector('.key-CAPS');
+            shiftKeys = keyboard.querySelectorAll('.key-shift');
+            controlKey = keyboard.querySelector('.key-ctrl');
+            commandKey = keyboard.querySelector('.key-open-apple');
+            optionKey = keyboard.querySelector('.key-closed-apple');
+            lockKey = keyboard.querySelector('.key-caps');
 
             window.addEventListener('keydown', function(evt) {
                 if (evt.keyCode == 16) { // Shift

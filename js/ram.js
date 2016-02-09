@@ -10,8 +10,8 @@
  * implied warranty.
  */
 
-var Util = require('./util.js');
-var Base64 = require('./base64.js');
+var Util = require('./util');
+var Base64 = require('./base64');
 
 var allocMemPages = Util.allocMemPages;
 var base64_encode = Base64.encode;

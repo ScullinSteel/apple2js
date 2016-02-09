@@ -10,8 +10,7 @@
  * implied warranty.
  */
 
-/*jshint node:true */
-var RAM = require('./ram.js');
+var RAM = require('./ram');
 
 function LanguageCard(io, rom) {
     var _io = io;

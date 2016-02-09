@@ -10,10 +10,6 @@
  * implied warranty.
  */
 
-/*jshint node: true */
-
-var console = require('console');
-
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -43,17 +39,6 @@ function bytify(ary) {
         result = new Uint8Array(ary);
     }
     return result;
-}
-
-function extend(ary1, ary2) {
-    ary2.forEach(function(val) {
-         ary1.push(val);
-    });
-    return ary1;
-}
-
-function debug(msg) {
-    console.log(msg);
 }
 
 function toHex(v, n) {
@@ -100,29 +85,12 @@ function hup( url ) {
         return results[1];
     }
 }
-    
-function keys(obj) {
-    var result = [];
-    for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            result.push(key);
-        }
-    }
-    return result;
-}
-
-function each(obj, fn) {
-    keys(obj).forEach(fn);
-}
 
 module.exports = {
     allocMemPages: allocMemPages,
     bytify: bytify,
-    extend: extend,
-    debug: debug,
     toBinary: toBinary,
     toHex: toHex,
     gup: gup,
-    hup: hup,
-    each: each
+    hup: hup
 };
