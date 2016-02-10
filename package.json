@@ -11,6 +11,9 @@
     "type": "git",
     "url": "https://github.com/scullinsteel/apple2js.git"
   },
+  "scripts": {
+    "start": "grunt dev"
+  },
   "dependencies": {
     "cpu6502": "git@github.com:scullinsteel/cpu6502.git",
     "debug": "^2.2.0",

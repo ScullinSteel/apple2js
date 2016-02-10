@@ -15,6 +15,8 @@ $key-border-pressed: #44372c;
 $key-text: #fff;
 $key-active: #4f4;
 
+$keyboard-font: sans-serif;
+
 img {
   border: 0;
 }
@@ -99,7 +101,7 @@ body {
   border-radius: 3px;
   color: $key-text;
   float: right;
-  font: 9px sans-serif;
+  font: 9px $keyboard-font;
   height: 42px;
   padding: 0;
   width: 42px;
@@ -108,6 +110,10 @@ body {
     background-color: $key-back-pressed;
     border: 3px outset $key-border-pressed;
   }
+
+  &:focus {
+    outline: none;
+  }
 }
 
 #keyboard {
@@ -115,7 +121,7 @@ body {
 
   .row {
     display: block;
-    font-family: Helvetica;
+    font-family: $keyboard-font;
     padding: 0;
 
     &.row0 {
@@ -171,7 +177,7 @@ body {
           font-size: 7px;
         }
       }
-    }    
+    }
   }
 
   .key-shift {
@@ -298,7 +304,7 @@ body {
             display: none;
           }
         }
-      
+
         &.active {
           div {
             background-image: url('../img/open-apple24-green.png');

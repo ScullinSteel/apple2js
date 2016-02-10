@@ -75,11 +75,14 @@
             req.send();
         }
 
-        var hash = document.location.hash;
-        if (hash) {
-            var url = hash.substr(1);
-            loadHTTP(url, 1);
+        function updateHash() {
+            var hash = document.location.hash;
+            if (hash) {
+                var url = hash.substr(1);
+                loadHTTP(url, 1);
+            }
         }
+        window.onhashchange = updateHash
 
         disk2.addDriveLightListener(function(drive, on) {
             var disk = document.getElementById('disk' + drive);

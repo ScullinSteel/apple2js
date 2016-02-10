@@ -6,9 +6,9 @@ module.exports = function(grunt) {
                 src: [],
                 dest: './dist/module.js',
                 options: {
-                    extensions: ['.js'], 
+                    extensions: ['.js'],
                     require: ['./js/main.js']
-                } 
+                }
             }
         },
         jshint: {
@@ -31,6 +31,7 @@ module.exports = function(grunt) {
         connect: {
             server: {
                 options: {
+                    open: true,
                     port: 8000,
                     base: {
                         path: 'dist',
@@ -104,7 +105,7 @@ module.exports = function(grunt) {
             }
         }
     });
-    
+
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-connect');
@@ -113,7 +114,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sass');
-    
+
     grunt.registerTask('default', [
         'jshint',
         'sass',
