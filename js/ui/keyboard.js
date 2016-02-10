@@ -1,5 +1,4 @@
-/* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2013 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -9,8 +8,6 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  */
-
-/*jshint browser:true */
 
 var Util = require('../util');
 var debug = require('debug')('apple2js:keyboard');

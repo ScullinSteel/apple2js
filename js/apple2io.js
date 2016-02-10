@@ -1,5 +1,4 @@
-/* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2014 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -111,6 +110,7 @@ function Apple2IO(cpu, callbacks)
         var result = 0;
         var now = cpu.cycles();
         var delta = now - _trigger;
+
         switch (off) {
         case LOC.CLR80VID:
             // debug('80 Column Mode off');
@@ -293,7 +293,7 @@ function Apple2IO(cpu, callbacks)
             _trigger = cpu.cycles();
             break;
         case LOC.TAPEIN:
-            var flipped = false;
+            // var flipped = false;
             if (_tapeOffset == -1) {
                 _tapeOffset = 0;
                 _tapeNext = now;
@@ -304,7 +304,7 @@ function Apple2IO(cpu, callbacks)
                         debug('Read ' + (_tapeOffset / 1000));
                     }
                     _tapeFlip = !_tapeFlip;
-                    flipped = true;
+                    // flipped = true;
                     _tapeNext += _tape[_tapeOffset++];
                 }
                 result = _tapeFlip ? 0x80 : 0x00;

@@ -1,5 +1,4 @@
-/* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2014 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -10,7 +9,7 @@
  * implied warranty.
  */
 
-/*jshint browser:true */
+var debug = require('debug')('apple2js:ui:audio');
 
 var sound = true;
 var _samples = [];
@@ -56,7 +55,7 @@ if (typeof AC !== 'undefined') {
 module.exports = {
     initAudio: function initAudio(io) {
         if (audioContext) {
-            console.log('Using Webkit Audio');
+            debug('Using Webkit Audio');
             io.sampleRate(audioContext.sampleRate);
             io.addSampleListener(function(sample) {
                 if (sound) {
@@ -73,4 +72,3 @@ module.exports = {
         sound = enable;
     }
 };
-

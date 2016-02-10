@@ -1,4 +1,3 @@
-/* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 /* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
@@ -142,7 +141,7 @@ function LoresPage(page)
             // 000001cd eabab000 -> 000abcde 
             var ab = (adj & 0x18),
                 cd = (page & 0x03) << 1,
-                 e = adj >> 7;
+                e = adj >> 7;
 
             var row = ab | cd | e, color, idx, jdx, b;
 
@@ -322,7 +321,7 @@ function HiresPage(page)
             // 000001cd eabab000 -> 000abcde 
             var ab = (adj & 0x18),
                 cd = (page & 0x03) << 1,
-                 e = adj >> 7;
+                e = adj >> 7;
 
             var rowa = ab | cd | e,
                 rowb = base >> 10;
@@ -333,16 +332,16 @@ function HiresPage(page)
                 }
                 
                 var data = pages[_page].data,
-                dy = rowa * 8 + rowb,
-                dx = col * 14 - 2,
-                b0 = col > 0 ? _buffer[base - 1] : 0,
-                b2 = col < 39 ? _buffer[base + 1] : 0;
+                    dy = rowa * 8 + rowb,
+                    dx = col * 14 - 2,
+                    b0 = col > 0 ? _buffer[base - 1] : 0,
+                    b2 = col < 39 ? _buffer[base + 1] : 0;
                 val |= (b2 & 0x3) << 7;
                 var v0 = b0 & 0x20, v1 = b0 & 0x40, v2 = val & 0x1,
-                odd = (col & 0x1) === 0,
-                color, 
-                oddCol = (hbs ? orangeCol : greenCol),
-                evenCol = (hbs ? blueCol : violetCol);
+                    odd = (col & 0x1) === 0,
+                    color, 
+                    oddCol = (hbs ? orangeCol : greenCol),
+                    evenCol = (hbs ? blueCol : violetCol);
 
                 off = dx * 4 + dy * 560 * 4 * 2;
                 for (var idx = 0; idx < 9; idx++, off += 8) {

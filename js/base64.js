@@ -44,11 +44,11 @@ function base64_encode (data) {
     enc = tmp_arr.join('');
     
     switch (data.length % 3) {
-        case 1:
-            enc = enc.slice(0, -2) + '==';
+    case 1:
+        enc = enc.slice(0, -2) + '==';
         break;
-        case 2:
-            enc = enc.slice(0, -1) + '=';
+    case 2:
+        enc = enc.slice(0, -1) + '=';
         break;
     }
 
@@ -97,10 +97,10 @@ function base64_decode(data) {
         o2 = bits>>8 & 0xff;
         o3 = bits & 0xff;
 
-	tmp_arr[ac++] = o1;
+        tmp_arr[ac++] = o1;
         if (h3 != 64) {
             tmp_arr[ac++] = o2;
-	}
+        }
         if (h4 != 64) {
             tmp_arr[ac++] = o3;
         }

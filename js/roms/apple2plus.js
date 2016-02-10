@@ -1,5 +1,3 @@
-/* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-
 function Apple2ROM()
 {
     var rom = [

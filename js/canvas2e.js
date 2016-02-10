@@ -1,5 +1,4 @@
-/* -*- mode: JavaScript; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* Copyright 2010-2013 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -192,7 +191,7 @@ function LoresPage(page)
             // 000001cd eabab000 -> 000abcde 
             var ab = (adj & 0x18),
                 cd = (page & 0x03) << 1,
-                 e = adj >> 7;
+                e = adj >> 7;
             var idx, jdx;
             var row = ab | cd | e;
             var b;
@@ -313,11 +312,10 @@ function LoresPage(page)
             }
         },
         refresh: function() {
-            var page, off, addr = 0x400 * _page;
+            var addr = 0x400 * _page;
             _refreshing = true;
             for (var idx = 0; idx < 0x400; idx++, addr++) {
                 page = addr >> 8;
-                off = addr & 0xff;
                 this._write(addr >> 8, addr & 0xff, _buffer[0][idx], 0);
                 if (_80colMode) {
                     this._write(addr >> 8, addr & 0xff, _buffer[1][idx], 1);
@@ -522,7 +520,7 @@ function HiresPage(page)
                 return [c[0] * 0.75, c[1] * 0.75, c[2] * 0.75];
             }
             var addr = (page << 8) | off, base = addr - 0x2000 * _page,
-            idx, jdx;
+                idx, jdx;
             if (_buffer[bank][base] == val && !_refreshing) {
                 return;
             }
@@ -541,7 +539,7 @@ function HiresPage(page)
             // 000001cd eabab000 -> 000abcde 
             var ab = (adj & 0x18),
                 cd = (page & 0x03) << 1,
-                 e = adj >> 7;
+                e = adj >> 7;
 
             var rowa = ab | cd | e,
                 rowb = base >> 10;
@@ -627,10 +625,10 @@ function HiresPage(page)
                     b2 = col < 39 ? _buffer[bank][base + 1] : 0;
                     val |= (b2 & 0x3) << 7;
                     var v0 = b0 & 0x20, v1 = b0 & 0x40, v2 = val & 0x1,
-                    odd = !(col & 0x1),
-                    color, 
-                    oddCol = (hbs ? orangeCol : greenCol),
-                    evenCol = (hbs ? blueCol : violetCol);
+                        odd = !(col & 0x1),
+                        color, 
+                        oddCol = (hbs ? orangeCol : greenCol),
+                        evenCol = (hbs ? blueCol : violetCol);
                     
                     off = dx * 4 + dy * 280 * 4 * 2;
                     for (idx = 0; idx < 9; idx++, off += 8) {

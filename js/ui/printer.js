@@ -1,5 +1,3 @@
-/*jshint browser:true */
-
 function Printer() {
     var _printer = null;
     return {
