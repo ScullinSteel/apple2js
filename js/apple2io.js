@@ -39,6 +39,8 @@ function Apple2IO(cpu, callbacks)
     var _high = 0.5;
     var _low = -0.5;
 
+    var _audioListener = null;
+    
     var _trigger = 0;
 
     var _tape = [];
