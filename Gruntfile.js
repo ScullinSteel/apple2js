@@ -69,6 +69,9 @@ module.exports = function(grunt) {
                 }]
             }
         },
+        sasslint: {
+            target: ['./css/*.scss']
+        },
         clean: {
             dist: ['./dist']
         },
@@ -112,9 +115,15 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sass');
+    grunt.loadNpmTasks('grunt-sass-lint');
+
+    grunt.registerTask('lint', [
+        'eslint',
+        'sasslint'
+    ]);
 
     grunt.registerTask('default', [
-        'eslint',
+        'lint',
         'sass',
         'browserify',
         'uglify',
