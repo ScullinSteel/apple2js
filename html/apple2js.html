@@ -11,7 +11,7 @@
     <div style="margin: auto; width: 602px">
       <img id="badge" src="img/badge.png" />
       <h1 id="subtitle">An Apple //e Emulator in JavaScript</h1>
-      <div class="overscan">
+      <div class="overscan" id="crt">
         <canvas width="560" height="384" id="screen" />
       </div>
       <div class="inset drives">
@@ -23,7 +23,7 @@
           <div class="light" id="disk2">&nbsp;</div>
           <span id="disklabel2" class="label">Disk 2</span>
         </div>
-        <button onclick="cpu.reset()" id="reset" class="noselect">
+        <button onclick="main.reset()" id="reset" class="noselect">
           RESET
         </button>
         <div style="clear: both"></div>
@@ -35,60 +35,18 @@
     <script type="text/javascript">
     {
         var main = require('./js/main.js');
-        var disk2 = main.getDiskII();
-        var cpu = main.getCPU();
-
-        function loadHTTP(url, drive) {
-            var parts = url.split(/[\/\.]/);
-            var name = decodeURIComponent(parts[parts.length - 2]);
-            var ext = parts[parts.length - 1].toLowerCase();
-            var label = document.querySelector('#disklabel' + drive);
-
-            console.log('Loading', url, 'into drive', drive);
-            var req = new XMLHttpRequest();
-            req.open('GET', url, true);
-
-            if (ext == 'json') {
-                req.onload = function(e) {
-                    var json;
-                    try {
-                        json = JSON.parse(req.responseText);
-                        if (disk2.setDisk(drive, json)) {
-                            label.innerHTML = json.name;
-                        }
-                    } catch (e) {
-                        alert('Sorry, couldn\'t read "' + url + '"');
-                    }
-                };
-            } else {
-                req.responseType = 'arraybuffer';
-
-                req.onload = function(e) {
-                    if (disk2.setBinary(drive, name, ext, req.response)) {
-                        label.innerHTML = name;
-                    }
-                };
-            }
-            req.onerror = function(e) {
-                alert('Sorry, couldn\'t load "' + url + '"');
-            }
-            req.send();
-        }
 
         function updateHash() {
             var hash = document.location.hash;
             if (hash) {
-                var url = hash.substr(1);
-                loadHTTP(url, 1);
+                var urls = hash.substr(1).split(',')
+                for (var idx = 0; idx < urls.length; idx++) {
+                    main.loadHTTP(urls[idx], idx + 1);
+                }
             }
         }
+        updateHash();
         window.onhashchange = updateHash
-
-        disk2.addDriveLightListener(function(drive, on) {
-            var disk = document.getElementById('disk' + drive);
-            disk.style.backgroundImage = on ?
-                'url(img/red-on-16.png)' : 'url(img/red-off-16.png)';
-        });
     }
     </script>
   </body>

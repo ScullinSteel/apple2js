@@ -1,4 +1,3 @@
-/*jshint browser: true */
 var CPU6502 = require('cpu6502');
 var RAM = require('./ram');
 var canvas2 = require('./canvas2');
@@ -54,6 +53,7 @@ function AppleII(options) {
                 _requestAnimationFrame(runFn);
             }
         };
+        
         if (_requestAnimationFrame) {
             _requestAnimationFrame(runFn);
         } else {

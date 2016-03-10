@@ -1,21 +1,9 @@
 // Copyright 2010-2015 Will Scullin
 
-$black: #000;
+@import './colors';
 
 $body: #d1cbb5;
 $body-border: #f0edd0;
-
-$power-key-back: #ffd;
-$power-key-green: #4f4;
-
-$key-back: #44372c;
-$key-back-pressed: #22150a;
-$key-border: #66594e;
-$key-border-pressed: #44372c;
-$key-text: #fff;
-$key-active: #4f4;
-
-$keyboard-font: sans-serif;
 
 img {
   border: 0;
@@ -47,7 +35,14 @@ body {
   height: 384px;
   margin: auto;
   padding: 16px;
+  position: relative;
   width: 560px;
+
+  div {
+    left: 16px;
+    position: absolute;
+    top: 16px;
+  }
 
   canvas {
     cursor: crosshair;
@@ -95,246 +90,6 @@ body {
   width: 100%;
 }
 
-#reset {
-  background-color: $key-back;
-  border: 3px outset $key-border;
-  border-radius: 3px;
-  color: $key-text;
-  float: right;
-  font: 9px $keyboard-font;
-  height: 42px;
-  padding: 0;
-  width: 42px;
-
-  &:active {
-    background-color: $key-back-pressed;
-    border: 3px outset $key-border-pressed;
-  }
-
-  &:focus {
-    outline: none;
-  }
-}
-
-#keyboard {
-  margin: 0 10px;
-
-  .row {
-    display: block;
-    font-family: $keyboard-font;
-    padding: 0;
-
-    &.row0 {
-      margin-left: 20px;
-    }
-
-    &.row2 {
-      margin-left: 10px;
-    }
-
-    &.row3 {
-      margin-left: 10px;
-    }
-
-    &.row4 {
-      margin-left: 10px;
-    }
-  }
-
-  .key {
-    background-color: $key-back;
-    border: 5px outset $key-border;
-    border-radius: 3px;
-    color: $key-text;
-    cursor: pointer;
-    display: inline-block;
-    height: 32px;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    text-align: center;
-    text-transform: uppercase;
-    vertical-align: bottom;
-    width: 32px;
-
-    &.active {
-      color: $key-active;
-    }
-
-    &.pressed {
-      background-color: $key-back-pressed;
-      border: 5px outset $key-border-pressed;
-    }
-
-    div {
-      bottom: 1px;
-      width: 100%;
-
-      span {
-        font-size: 14px;
-
-        &.small {
-          font-size: 7px;
-        }
-      }
-    }
-  }
-
-  .key-shift {
-    width: 53px;
-  }
-
-  .key-return {
-    width: 52px;
-  }
-
-  .key-delete {
-    width: 47px;
-  }
-
-  .key-tab {
-    width: 47px;
-  }
-
-  .key-power {
-    background-color: $power-key-back;
-    border: 2px groove $black;
-    border-radius: 2px;
-    color: $black;
-    height: 38px;
-    width: 38px;
-
-    div {
-      bottom: 15px;
-    }
-  }
-
-  .key-nbsp {
-    margin-left: 62px;
-    width: 330px;
-  }
-
-  .key-pow {
-    background-color: $power-key-back;
-    border: 2px groove $black;
-    border-radius: 2px;
-    color: $black;
-    height: 38px;
-    width: 38px;
-
-    div {
-      bottom: 15px;
-
-      span {
-        background: $power-key-green;
-        color: $power-key-green;
-      }
-    }
-  }
-}
-
-.apple2e {
-  #keyboard {
-    margin: 0;
-
-    .row {
-      width: 610px;
-
-      &.row0 {
-        margin-left: 0;
-      }
-
-      &.row2 {
-        margin-left: 0;
-      }
-
-      &.row3 {
-        margin-left: 0;
-      }
-
-      &.row4 {
-        margin-left: 0;
-      }
-    }
-
-    .key {
-      div {
-        position: absolute;
-        text-align: center;
-      }
-
-      &.vcenter {
-        div {
-          bottom: 10px;
-        }
-      }
-
-      &.vcenter2 {
-        div {
-          bottom: 5px;
-        }
-      }
-
-      &.key-ctrl {
-        width: 60px;
-      }
-
-      &.key-return {
-        width: 60px;
-      }
-
-      &.key-shift {
-        width: 81px;
-      }
-
-      &.key-nbsp {
-        margin-left: 0;
-        width: 215px;
-      }
-
-      &.key-open-apple {
-        div {
-          background-image: url('../img/open-apple24.png');
-          bottom: 1px;
-          height: 24px;
-          left: 4px;
-          width: 24px;
-
-          span {
-            display: none;
-          }
-        }
-
-        &.active {
-          div {
-            background-image: url('../img/open-apple24-green.png');
-          }
-        }
-      }
-
-      &.key-closed-apple {
-        div {
-          background-image: url('../img/closed-apple24.png');
-          bottom: 1px;
-          height: 24px;
-          left: 4px;
-          width: 24px;
-
-          span {
-            display: none;
-          }
-        }
-
-        &.active {
-          div {
-            background-image: url('../img/closed-apple24-green.png');
-          }
-        }
-      }
-    }
-  }
-}
-
 .noselect {
   -khtml-user-select: none;
   -moz-user-select: none;
@@ -343,3 +98,5 @@ body {
   -webkit-user-select: none;
   user-select: none;
 }
+
+@import './keyboard';
