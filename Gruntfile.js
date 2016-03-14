@@ -1,16 +1,6 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        browserify: {
-            dist: {
-                src: [],
-                dest: './dist/module.js',
-                options: {
-                    extensions: ['.js'],
-                    require: ['./js/main.js']
-                }
-            }
-        },
         eslint: {
             files: [
                 'Gruntfile.js',
@@ -85,7 +75,7 @@ module.exports = function(grunt) {
         watch: {
             scripts: {
                 files: ['<%= eslint.files %>'],
-                tasks: ['eslint','browserify'],
+                tasks: ['eslint','webpack'],
                 options: {
                     livereload: true
                 }
@@ -104,10 +94,20 @@ module.exports = function(grunt) {
                     livereload: true
                 }
             }
+        },
+        webpack: {
+            dist: {
+                devtool: 'source-map',
+                entry: './js/main.js',
+                output: {
+                    path: 'dist/',
+                    filename: 'module.js',
+                    sourceMapFilename: 'module.map'
+                }
+            }
         }
     });
 
-    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -116,6 +116,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-sass-lint');
+    grunt.loadNpmTasks('grunt-webpack');
 
     grunt.registerTask('lint', [
         'eslint',
@@ -125,7 +126,7 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'lint',
         'sass',
-        'browserify',
+        'webpack',
         'uglify',
         'copy'
     ]);

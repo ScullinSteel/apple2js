@@ -9,9 +9,10 @@
  * implied warranty.
  */
 
+var debug = require('debug')('apple2js:ui:gamepad');
 var each = require('lodash/each');
 
-var gamepadSupportAvailable = !!navigator.webkitGetGamepads;
+var getGamepads = navigator.getGamepads || navigator.webkitGetGamepads;
 var gamepad;
 var gamepadMap = [];
 var gamepadState = [];
@@ -54,13 +55,18 @@ var DEFAULT_GAMEPAD = {
     'START': '\033'
 };
 
+if (getGamepads) {
+    debug('Gamepad support available');
+}
+
 window.addEventListener('gamepadconnected', function(e) {
+    debug('Gamepad connected');
     gamepad = e.gamepad;
 });
 
 function processGamepad(io) {
-    if (gamepadSupportAvailable) {
-        gamepad = navigator.webkitGetGamepads()[0];
+    if (getGamepads) {
+        gamepad = getGamepads.call(navigator)[0];
     }
     if (gamepad) {
         var x = (gamepad.axes[0] * 1.414 + 1) / 2.0; 
@@ -109,6 +115,8 @@ module.exports = {
     },
 
     updateGamepadMap: function updateGamepadMap(data) {
+        debug('updateGamepadMap', data);
+
         for (var idx = 0; idx < 16; idx++) {
             gamepadMap[idx] = undefined;
         }

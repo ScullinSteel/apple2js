@@ -158,17 +158,29 @@ $keyboard-font: sans-serif;
         position: absolute;
         text-align: center;
       }
+    }
 
-      &.vcenter {
+    .vcenter {
+      div {
+        bottom: 10px;
+      }
+
+      &.key-open-apple {
         div {
-          bottom: 10px;
+          bottom: 1px;
         }
       }
 
-      &.vcenter2 {
+      &.key-closed-apple {
         div {
-          bottom: 5px;
+          bottom: 1px;
         }
+      }
+    }
+
+    .vcenter2 {
+      div {
+        bottom: 5px;
       }
     }
 
