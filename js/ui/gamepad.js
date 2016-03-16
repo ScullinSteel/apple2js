@@ -107,7 +107,7 @@ function processGamepad(io) {
 
 module.exports = {
     initGamepad: function initGamepad(io) {
-        if (gamepadSupportAvailable) {
+        if (getGamepads) {
             setInterval(function() {
                 processGamepad(io);
             }, 100);
