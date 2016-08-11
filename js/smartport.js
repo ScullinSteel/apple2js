@@ -18,12 +18,12 @@ var base64_decode = Base64.decode;
 
 function SmartPort(cpu, slot) {
 
-    var disk64 = require('../json/disks/basic.json');
+    var disk64 = require('json!../json/disks/basic.json');
     var disk = [];
 
     disk[1] = [];
     for (var idx = 0; idx < 1600; idx++) {
-        disk[1][idx] = base64_decode(disk64[idx]);
+        disk[1][idx] = base64_decode(disk64.blocks[idx]);
     }
 
     /*
@@ -54,6 +54,30 @@ function SmartPort(cpu, slot) {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x10
     ];
+
+    function dumpBlock(drive, block) {
+        var result = '';
+        var b;
+        var jdx;
+        for (idx = 0; idx < 16; idx++) {
+            result += toHex(idx << 4) + ': ';
+            for (jdx = 0; jdx < 16; jdx++) {
+                b = disk[drive][block][idx * 16 + jdx];
+                result += toHex(b) + ' ';
+            }
+            result += '        ';
+            for (jdx = 0; jdx < 16; jdx++) {
+                b = disk[drive][block][idx * 16 + jdx] & 0x7f;
+                if (b >= 0x20 && b < 0x7f) {
+                    result += String.fromCharCode(b);
+                } else {
+                    result += '.';
+                }
+            }
+            result += '\n';
+        }
+        return result;
+    }
 
     function Address() {
         var lo;
@@ -156,8 +180,9 @@ function SmartPort(cpu, slot) {
                     block = blockAddr.readWord();
                     debug('read buffer=' + buffer);
                     debug('read block=' + toHex(block));
+                    debug('read data=', '\n', dumpBlock(unit, block));
 
-                    for (idx = 0; idx++; idx < 512) {
+                    for (idx = 0; idx < 512; idx++) {
                         buffer.writeByte(disk[unit][block][idx]);
                         buffer = buffer.inc(1);
                     }
@@ -238,7 +263,7 @@ function SmartPort(cpu, slot) {
                     debug('read buffer=' + buffer);
                     debug('read block=' + toHex(block));
 
-                    for (idx = 0; idx++; idx < 512) {
+                    for (idx = 0; idx < 512; idx++) {
                         buffer.writeByte(disk[unit][block][idx]);
                         buffer = buffer.inc(1);
                     }
@@ -253,7 +278,7 @@ function SmartPort(cpu, slot) {
                     debug('write buffer=' + buffer);
                     debug('write block=' + toHex(block));
 
-                    for (idx = 0; idx++; idx < 512) {
+                    for (idx = 0; idx < 512; idx++) {
                         disk[unit][block][idx] = buffer.readByte();
                         buffer = buffer.inc(1);
                     }
