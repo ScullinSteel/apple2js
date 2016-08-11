@@ -9,6 +9,8 @@
  * implied warranty.
  */
 
+/*global Uint8Array: false */
+
 var Util = require('./util');
 var Base64 = require('./base64');
 var events = require('events');

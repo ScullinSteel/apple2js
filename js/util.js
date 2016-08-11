@@ -9,6 +9,8 @@
  * implied warranty.
  */
 
+/*global Uint8Array */
+
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();

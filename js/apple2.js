@@ -4,6 +4,7 @@ var charset = require('./charroms/apple2echar').charset;
 var canvas2 = require('./canvas2');
 var canvas2e = require('./canvas2e');
 var Apple2IO = require('./apple2io');
+var SmartPort = require('./smartport');
 var DiskII = require('./disk2');
 var LanguageCard = require('./langcard');
 var MMU = require('./mmu');
@@ -71,6 +72,7 @@ function AppleII(options) {
     var vm = new VideoModes(lores1, hires1, lores2, hires2);
     var io = new Apple2IO(cpu, vm);
 
+    var smartport = new SmartPort(cpu, 5);
     var disk2 = new DiskII(io, 6);
     var thunderclock = new Thunderclock(io, 7);
 
