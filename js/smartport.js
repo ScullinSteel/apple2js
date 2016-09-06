@@ -10,6 +10,7 @@
  */
 
 var debug = require('debug')('apple2js:smartport');
+var debugBlocks = require('debug')('apple2js:smartport:blocks');
 var Base64 = require('./base64');
 var Util = require('./util');
 var toHex = Util.toHex;
@@ -26,7 +27,7 @@ function SmartPort(cpu, slot) {
     */
 
     var ROM = [
-        0x00, 0x20, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xD8, 0x20, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x60, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -44,10 +45,9 @@ function SmartPort(cpu, slot) {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x10
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x10
     ];
 
-    var basicDisk = require('json!../json/disks/basic.json');
     var disks = [];
 
     function decodeDisk(unit, disk) {
@@ -57,7 +57,8 @@ function SmartPort(cpu, slot) {
         }
     }
 
-    decodeDisk(1, basicDisk);
+    decodeDisk(1, require('json!../json/disks/appleworks.json'));
+    // decodeDisk(1, require('json!../json/disks/games.json'));
 
     function Address() {
         var lo;
@@ -130,15 +131,21 @@ function SmartPort(cpu, slot) {
         var result = '';
         var b;
         var jdx;
-        for (var idx = 0; idx < 16; idx++) {
-            result += toHex(idx << 4) + ': ';
+        for (var idx = 0; idx < 32; idx++) {
+            result += toHex(idx << 4, 4) + ': ';
             for (jdx = 0; jdx < 16; jdx++) {
                 b = disks[drive][block][idx * 16 + jdx];
+                if (jdx == 8) {
+                    result += ' ';
+                }
                 result += toHex(b) + ' ';
             }
             result += '        ';
             for (jdx = 0; jdx < 16; jdx++) {
                 b = disks[drive][block][idx * 16 + jdx] & 0x7f;
+                if (jdx == 8) {
+                    result += ' ';
+                }
                 if (b >= 0x20 && b < 0x7f) {
                     result += String.fromCharCode(b);
                 } else {
@@ -151,16 +158,38 @@ function SmartPort(cpu, slot) {
     }
 
     /*
+     * getDeviceInfo
+     */
+
+    function getDeviceInfo(state, drive) {
+        if (disks[drive]) {
+            var blocks = disks[drive].length;
+            state.x = blocks & 0xff;
+            state.y = blocks >> 8;
+
+            state.a = 0;
+            state.s &= 0xfe;
+        } else {
+            state.a = 0x28;
+            state.s |= 0x01;
+        }
+    }
+
+    /*
      * readBlock
      */
 
-    function readBlock(state, unit, block, buffer) {
+    function readBlock(state, drive, block, buffer) {
+        debug('read drive=' + drive);
         debug('read buffer=' + buffer);
-        debug('read block=' + toHex(block));
-        debug('read data=', '\n' + dumpBlock(unit, block));
+        debug('read block=$' + toHex(block));
+
+        if (debugBlocks.enabled) {
+            debugBlocks('read', '\n' + dumpBlock(drive, block));
+        }
 
         for (var idx = 0; idx < 512; idx++) {
-            buffer.writeByte(disks[unit][block][idx]);
+            buffer.writeByte(disks[drive][block][idx]);
             buffer = buffer.inc(1);
         }
 
@@ -172,24 +201,32 @@ function SmartPort(cpu, slot) {
      * writeBlock
      */
 
-    function writeBlock(state, unit, block, buffer) {
-        debug('write unit=' + unit);
+    function writeBlock(state, drive, block, buffer) {
+        debug('write drive=' + drive);
         debug('write buffer=' + buffer);
-        debug('write block=' + toHex(block));
+        debug('write block=$' + toHex(block));
+
+        if (debugBlocks.enabled) {
+            debugBlocks('write', '\n' + dumpBlock(drive, block));
+        }
 
         for (var idx = 0; idx < 512; idx++) {
-            disks[unit][block][idx] = buffer.readByte();
+            disks[drive][block][idx] = buffer.readByte();
             buffer = buffer.inc(1);
         }
         state.a = 0;
         state.s &= 0xfe;
     }
 
-    function formatDevice(state, unit) {
-        for (var idx = 0; idx < disks[unit].length; idx++) {
-            disks[unit][idx] = [];
+    /*
+     * formatDevice
+     */
+
+    function formatDevice(state, drive) {
+        for (var idx = 0; idx < disks[drive].length; idx++) {
+            disks[drive][idx] = [];
             for (var jdx = 0; jdx < 512; jdx++) {
-                disks[unit][idx][jdx] = 0;
+                disks[drive][idx][jdx] = 0;
             }
         }
 
@@ -210,29 +247,38 @@ function SmartPort(cpu, slot) {
             return 0xc0 + slot;
         },
 
-        read: function(page, off) {
+        read: function(page, off, debugFlag) {
             var state = cpu.getState();
             var cmd;
             var unit;
             var buffer;
             var block;
 
-            if (off == 0x10) { // Regular block device entry POINT
+            if (!debugFlag) {
+                debug('read $' + toHex(page) + toHex(off) + '=$' + toHex(ROM[off]), cpu.sync());
+            }
+
+            if (off == 0x00 && cpu.sync()) {
+                readBlock(state, 1, 0, new Address(0x0800));
+                state.x = slot << 4;
+                state.pc = 0x801;
+            } else if (off == 0x10 && cpu.sync()) { // Regular block device entry POINT
                 debug('block device entry');
                 cmd = cpu.read(0x00, 0x42);
                 unit = cpu.read(0x00, 0x43);
                 var bufferAddr;
                 var blockAddr;
+                var drive = (unit & 0x80) ? 2 : 1;
+                var driveSlot = (unit & 0x70) >> 4;
 
                 debug('cmd=' + cmd);
-                debug('unit=' + unit);
+                debug('unit=$' + toHex(unit));
 
-                unit = 1; // CHEAT
+                debug('slot=' + driveSlot + ' drive=' + drive);
 
                 switch (cmd) {
                 case 0: // INFO
-                    state.x = 0x40;
-                    state.y = 0x06;
+                    getDeviceInfo(state, drive);
                     break;
 
                 case 1: // READ
@@ -241,7 +287,7 @@ function SmartPort(cpu, slot) {
                     blockAddr = new Address(0x46);
                     block = blockAddr.readWord();
 
-                    readBlock(state, unit, block, buffer);
+                    readBlock(state, drive, block, buffer);
                     break;
 
                 case 2: // WRITE
@@ -250,13 +296,13 @@ function SmartPort(cpu, slot) {
                     blockAddr = new Address(0x46);
                     block = blockAddr.readWord();
 
-                    writeBlock(state, unit, block, buffer);
+                    writeBlock(state, drive, block, buffer);
                     break;
                 case 3: // FORMAT
                     formatDevice(state, unit);
                     break;
                 }
-            } else if (off == 0x13) {
+            } else if (off == 0x13 && cpu.sync()) {
                 debug('smartport entry');
                 var retVal = {};
                 var stackAddr = new Address(state.sp + 1, 0x01);
@@ -272,7 +318,7 @@ function SmartPort(cpu, slot) {
                 debug('cmd=' + cmd);
                 debug('cmdListAddr=' + cmdListAddr);
 
-                stackAddr.writeAddress(cmdBlockAddr.inc(2));
+                stackAddr.writeAddress(retVal.inc(3));
 
                 var parameterCount = cmdListAddr.readByte();
                 unit = cmdListAddr.inc(1).readByte();
@@ -291,7 +337,7 @@ function SmartPort(cpu, slot) {
                         switch (status) {
                         case 0:
                             buffer.writeByte(1); // one device
-                            buffer.inc(1).writeByte(0); // no interrupts
+                            buffer.inc(1).writeByte(1 << 6); // no interrupts
                             buffer.inc(2).writeByte(0); // reserved
                             buffer.inc(3).writeByte(0); // reserved
                             buffer.inc(4).writeByte(0); // reserved
@@ -300,18 +346,23 @@ function SmartPort(cpu, slot) {
                             buffer.inc(7).writeByte(0); // reserved
                             state.x = 8;
                             state.y = 0;
+                            state.a = 0;
+                            state.s &= 0xfe;
                             break;
                         }
                         break;
-                    case 1: // Unit 1
+                    default: // Unit 1
                         switch (status) {
                         case 0:
+                            var blocks = disks[unit].length;
                             buffer.writeByte(0xf0); // W/R Block device in drive
-                            buffer.inc(1).writeByte(0x40); // 1600 blocks
-                            buffer.inc(2).writeByte(0x06);
-                            buffer.inc(3).writeByte(0x00);
+                            buffer.inc(1).writeByte(blocks & 0xff); // 1600 blocks
+                            buffer.inc(2).writeByte((blocks & 0xff00) >> 8);
+                            buffer.inc(3).writeByte((blocks & 0xff0000) >> 16);
                             state.x = 4;
                             state.y = 0;
+                            state.a = 0;
+                            state.s &= 0xfe;
                             break;
                         }
                         break;
@@ -332,6 +383,24 @@ function SmartPort(cpu, slot) {
 
                 case 0x03: // FORMAT
                     formatDevice(state, unit);
+                    break;
+
+                case 0x04: // CONTROL
+                    break;
+
+                case 0x05: // INIT
+                    break;
+
+                case 0x06: // OPEN
+                    break;
+
+                case 0x07: // CLOSE
+                    break;
+
+                case 0x08: // READ
+                    break;
+
+                case 0x09: // WRITE
                     break;
                 }
             }

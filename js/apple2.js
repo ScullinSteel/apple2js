@@ -7,8 +7,10 @@ var Apple2IO = require('./apple2io');
 var SmartPort = require('./smartport');
 var DiskII = require('./disk2');
 var LanguageCard = require('./langcard');
+var RamFactor = require('./ramfactor');
 var MMU = require('./mmu');
 var Thunderclock = require('./thunderclock');
+var Debugger = require('./debugger');
 
 var kHz = 1023;
 var runTimer;
@@ -23,6 +25,7 @@ if (typeof window !== 'undefined') {
 }
 
 function AppleII(options) {
+    var cpuDebugger;
     var canvas = options.e ? canvas2e : canvas2;
     var LoresPage = canvas.LoresPage;
     var HiresPage = canvas.HiresPage;
@@ -46,9 +49,16 @@ function AppleII(options) {
                 step = stepMax;
             }
 
-            cpu.stepCycles(step);
+            cpu.stepCycles(step, cpuDebugger.callback);
             vm.blit();
             io.sampleTick();
+
+            if (cpuDebugger.breakpoint) {
+                if (runTimer) {
+                    clearInterval(runTimer);
+                }
+                return;
+            }
 
             if (_requestAnimationFrame) {
                 _requestAnimationFrame(runFn);
@@ -107,6 +117,7 @@ function AppleII(options) {
 
     vm.setContext(context);
 
+    cpuDebugger = new Debugger(cpu);
     cpu.reset();
     run();
 
@@ -124,6 +135,10 @@ function AppleII(options) {
 
         getIO: function getIO() {
             return io;
+        },
+
+        getDebugger: function getDebugger() {
+            return cpuDebugger;
         }
     };
 }

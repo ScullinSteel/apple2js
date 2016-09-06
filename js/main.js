@@ -5,13 +5,16 @@ var ROM = require('./roms/apple2enh');
 var AppleII = require('./apple2');
 var audio = require('./ui/audio');
 var gamepad = require('./ui/gamepad');
+var joystick = require('./ui/joystick');
 var KeyBoard = require('./ui/keyboard');
 
 window.debugLib = debugLib;
 
+var screen = document.querySelector('#screen');
+
 var main = new AppleII({
     e: true,
-    screenCanvas: document.querySelector('#screen'),
+    screenCanvas: screen,
     rom: new ROM()
 });
 
@@ -19,9 +22,13 @@ var cpu = window.cpu = main.getCPU();
 
 var io = main.getIO();
 var disk2 = main.getDiskII();
+var dbg = main.getDebugger();
 
 // Gamepad Input
 gamepad.initGamepad(io);
+
+// Joystick Input
+joystick.initJoystick(io, screen);
 
 // Audio Output
 audio.initAudio(io);
@@ -112,5 +119,6 @@ disk2.addDriveLightListener(function(drive, on) {
 
 window.main = {
     loadHTTP: loadHTTP,
-    reset: reset 
+    reset: reset,
+    dbg: dbg
 };

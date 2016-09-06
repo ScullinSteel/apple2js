@@ -12,7 +12,6 @@
 var Base64 = require('./base64');
 var Util = require('/.util');
 var base64_decode = Base64.decode;
-var base64_encode = Base64.encode;
 var debug = require('debug')('apple2js:ramfactor');
 
 function RAMFactor(io, slot, size) {

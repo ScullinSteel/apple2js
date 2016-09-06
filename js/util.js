@@ -88,6 +88,7 @@ function hup( url ) {
 }
 
 module.exports = {
+    allocMem: allocMem,
     allocMemPages: allocMemPages,
     bytify: bytify,
     toBinary: toBinary,

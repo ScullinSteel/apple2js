@@ -11,7 +11,7 @@
 
 var Util = require('./util');
 var Base64 = require('./base64');
-var debug = require('debug')('apple2js:canvas2');
+var debug = require('debug')('apple2js:canvas2e');
 
 var allocMemPages = Util.allocMemPages;
 var base64_decode = Base64.decode;
@@ -22,6 +22,7 @@ var textMode = true;
 var mixedMode = false;
 var hiresMode = false;
 var pageMode = 1;
+
 var _80colMode = false;
 var altCharMode = false;
 var doubleHiresMode = false;
@@ -569,6 +570,10 @@ function HiresPage(page)
                 if (doubleHiresMode) {
                     // Every 4 bytes is 7 pixels
                     // 2 bytes per bank
+
+                    // 76543210 76543210 76543210 76543210
+                    //  1111222  2333344  4455556  6667777
+
                     var mod = col % 2, mcol = col - mod;
                     bz = _buffer[0][base - mod - 1];
                     b0 = _buffer[1][base - mod];
@@ -677,12 +682,15 @@ function HiresPage(page)
                         evenCol = (hbs ? blueCol : violetCol);
 
                     off = dx * 4 + dy * 280 * 4 * 2;
+
+                    monoColor = _greenMode ? _green : null;
+
                     for (idx = 0; idx < 9; idx++, off += 8) {
                         val >>= 1;
 
                         if (v1) {
-                            if (_greenMode) {
-                                color = _green;
+                            if (monoColor) {
+                                color = monoColor;
                             } else if (highColorHGRMode) {
                                 color = dcolors[_buffer[1][base] >> 4];
                             } else if (v0 || v2) {
@@ -691,7 +699,7 @@ function HiresPage(page)
                                 color = odd ? oddCol : evenCol;
                             }
                         } else {
-                            if (_greenMode) {
+                            if (monoColor) {
                                 color = blackCol;
                             } else if (highColorHGRMode) {
                                 color = dcolors[_buffer[1][base] & 0x0f];
@@ -827,7 +835,7 @@ function VideoModes(gr,hgr,gr2,hgr2) {
             hiresMode = on;
             highColorHGRMode = false;
 
-            _seq = (on ? 'H+' : 'H-');
+            _seq = on ? 'H+' : 'H-';
             // debug('_seq=', _seq);
 
             if (old != on) {
