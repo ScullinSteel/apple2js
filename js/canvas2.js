@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2016 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -10,7 +10,6 @@
  */
 
 var Util = require('./util');
-var charset = require('./charroms/apple2lc').charset;
 var Base64 = require('./base64');
 
 var allocMemPages = Util.allocMemPages;
@@ -35,8 +34,10 @@ var scanlines = false;
  *
  ***************************************************************************/
 
-function LoresPage(page) 
+function LoresPage(page, charset)
 {
+    'use strict';
+
     // $00-$3F inverse
     // $40-$7F flashing
     // $80-$FF normal
@@ -109,16 +110,16 @@ function LoresPage(page)
             data[off + 560 * 4 + 2] = c2 >> 1;
         }
     }
-    
+
     _init();
 
     return {
-        start: function() { 
+        start: function() {
             var self = this;
             setInterval(function() {
                 self.blink();
             }, 267);
-            return (0x04 * _page); 
+            return (0x04 * _page);
         },
         end: function() { return (0x04 * _page) + 0x03; },
         read: function(page, off) {
@@ -138,7 +139,7 @@ function LoresPage(page)
             var col = (base % 0x80) % 0x28,
                 adj = off - col;
 
-            // 000001cd eabab000 -> 000abcde 
+            // 000001cd eabab000 -> 000abcde
             var ab = (adj & 0x18),
                 cd = (page & 0x03) << 1,
                 e = adj >> 7;
@@ -190,7 +191,7 @@ function LoresPage(page)
                                 off += 4;
                             }
                             off += 546 * 4 + 560 * 4;
-                        }                        
+                        }
                     } else {
                         for (jdx = 0; jdx < 8; jdx++) {
                             b = (jdx < 4) ? (val & 0x0f) : (val >> 4);
@@ -215,7 +216,7 @@ function LoresPage(page)
         },
         blink: function() {
             var addr = 0x400 * _page;
-            _refreshing = true; 
+            _refreshing = true;
             _blink = !_blink;
             for (var idx = 0; idx < 0x400; idx++, addr++) {
                 var b = _buffer[idx];
@@ -250,14 +251,14 @@ function LoresPage(page)
 }
 
 function HiresPage(page)
-{ 
+{
     var _page = page;
 
     var orangeCol = [0xff, 0x65, 0x00];
     var greenCol = [0x00, 0xff, 0x00];
     var blueCol = [0x09, 0x2a, 0xff];
     var violetCol = [0xc9, 0x39, 0xc7];
-    var whiteCol = [0xff, 0xff, 0xff]; 
+    var whiteCol = [0xff, 0xff, 0xff];
     var blackCol = [0x00, 0x00, 0x00];
 
     var _buffer = [];
@@ -273,7 +274,7 @@ function HiresPage(page)
             _buffer[idx] = 0; // Math.floor(Math.random()*256);
         }
     }
- 
+
     function _drawPixel(data, off, color) {
         var c0 = color[0], c1 = color[1], c2 = color[2];
 
@@ -290,7 +291,7 @@ function HiresPage(page)
             data[off + 560 * 4 + 2] = data[off + 560 * 4 + 6] = c2 >> 1;
         }
     }
-    
+
     _init();
 
     return {
@@ -311,14 +312,14 @@ function HiresPage(page)
                 return;
             }
             _buffer[base] = val;
-            
+
             var hbs = val & 0x80;
             val &= 0x7f;
 
             var col = (base % 0x80) % 0x28,
                 adj = off - col;
 
-            // 000001cd eabab000 -> 000abcde 
+            // 000001cd eabab000 -> 000abcde
             var ab = (adj & 0x18),
                 cd = (page & 0x03) << 1,
                 e = adj >> 7;
@@ -330,7 +331,7 @@ function HiresPage(page)
                 if (textMode || !hiresMode || (mixedMode && rowa > 19)) {
                     return;
                 }
-                
+
                 var data = pages[_page].data,
                     dy = rowa * 8 + rowb,
                     dx = col * 14 - 2,
@@ -339,7 +340,7 @@ function HiresPage(page)
                 val |= (b2 & 0x3) << 7;
                 var v0 = b0 & 0x20, v1 = b0 & 0x40, v2 = val & 0x1,
                     odd = (col & 0x1) === 0,
-                    color, 
+                    color,
                     oddCol = (hbs ? orangeCol : greenCol),
                     evenCol = (hbs ? blueCol : violetCol);
 
@@ -440,7 +441,7 @@ function VideoModes(gr,hgr,gr2,hgr2) {
                 _refresh();
             }
         },
-        mixed: function(on) { 
+        mixed: function(on) {
             var old = mixedMode;
             mixedMode = on;
             if (old != on) {
@@ -493,6 +494,10 @@ function VideoModes(gr,hgr,gr2,hgr2) {
             _grs[1].green(on);
             _hgrs[0].green(on);
             _hgrs[1].green(on);
+        },
+        scanlines: function(on) {
+            scanlines = on;
+            _refresh();
         }
     };
 }

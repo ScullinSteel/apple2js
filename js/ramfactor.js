@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2016 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -9,16 +9,15 @@
  * implied warranty.
  */
 
-var Util = require('./util');
 var Base64 = require('./base64');
-
-var allocMem = Util.allocMem;
-var base64_encode = Base64.encode;
+var Util = require('/.util');
 var base64_decode = Base64.decode;
-var bytify = Base64.bytify;
-var each = require('lodash/each');
+var base64_encode = Base64.encode;
+var debug = require('debug')('apple2js:ramfactor');
 
-function RAMFactor(mmu, io, slot, size) {
+function RAMFactor(io, slot, size) {
+    'use strict';
+
     var rom = [
         0x43,0x4f,0x50,0x59,0x52,0x49,0x47,0x48,
         0x54,0x20,0x28,0x43,0x29,0x20,0x31,0x39,
@@ -1069,14 +1068,12 @@ function RAMFactor(mmu, io, slot, size) {
     };
 
     function _init() {
-        each(LOC, function(val, key) {
-            LOC[key] += slot * 0x10;
-        });
-        mem = allocMem(size);
+        debug('RAMFactor card in slot', slot);
+
+        mem = Util.allocMem(size);
         for (var off = 0; off < size; off++) {
             mem[off] = 0;
         }
-        rom = bytify(rom);
     }
 
     function _sethi(val) {
@@ -1099,7 +1096,7 @@ function RAMFactor(mmu, io, slot, size) {
 
     function _access(off, val) {
         var result = 0;
-        switch (off) {
+        switch (off & 0x8f) {
         case LOC.RAMLO:
         case LOC._RAMLO:
             if (val !== undefined) {
@@ -1157,40 +1154,22 @@ function RAMFactor(mmu, io, slot, size) {
         return result;
     }
 
-    var auxRomFn = {
-        start: function auxRom_start() {
-            return 0xc8;
-        },
-        end: function auxRom_end() {
-            return 0xcf;
-        },
-        read: function auxRom_read(page, off) {
-            return rom[_firmware * 0x1000 + (page - 0xC0) * 0x100 + off];
-        },
-        write: function auxRom_write() {}
-    };
-
     _init();
 
     return {
-        start: function ramfactor_start() {
-            io.registerSwitches(this, LOC);
-            return 0xc0 + slot;
-        },
-        end: function ramfactor_end() {
-            return 0xc0 + slot;
-        },
-        read: function ramfactor_read(page, off) {
-            mmu.auxRom(slot, auxRomFn);
-
-            return rom[slot * 0x100 + off];
-        },
-        write: function ramfactor_write() {
-            mmu.auxRom(slot, auxRomFn);
-        },
-        ioSwitch: function ramfactor_ioSwitch(off, val) {
+        ioSwitch: function (off, val) {
             return _access(off, val);
         },
+        read: function ramfactor_read(page, off) {
+            var result;
+            if (page == 0xc0 + slot) {
+                result = rom[slot * 0x100 + off];
+            } else {
+                result = rom[_firmware * 0x1000 + (page - 0xC0) * 0x100 + off];
+            }
+            return result;
+        },
+        write: function ramfactor_write() {},
         reset: function ramfactor_reset() {
             _firmware = 0;
         },

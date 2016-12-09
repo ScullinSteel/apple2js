@@ -9,17 +9,19 @@
  * implied warranty.
  */
 
-var each = require('lodash/each');
+var debug = require('debug')('apple2js:thunderclock');
 
 function Thunderclock(mmu, io, slot)
 {
+    'use strict';
+
     var rom = [
         0x08,0x78,0x28,0x2c,0x58,0xff,0x70,0x05, // 00
         0x38,0xb0,0x01,0x18,0xb8,0x08,0x78,0x48,
         0x8a,0x48,0x98,0x48,0xad,0xff,0xcf,0x20, // 10
         0x1a,0xc8,0x68,0x68,0xba,0x8d,0xf8,0x07,
         0x0a,0x0a,0x0a,0x0a,0x8d,0x78,0x07,0x68, // 20
-        0x68,0x68,0xa8,0x68,0x9a,0x09,0x04,0x48, 
+        0x68,0x68,0xa8,0x68,0x9a,0x09,0x04,0x48,
         0x28,0x98,0xac,0x78,0x07,0xae,0xf8,0x07, // 30
         0x29,0x7f,0x48,0x50,0x0e,0xb8,0xa5,0x36,
         0xd0,0x04,0xe4,0x37,0xf0,0x0a,0xa9,0x08, // 40
@@ -284,23 +286,8 @@ function Thunderclock(mmu, io, slot)
     };
 
     function _init() {
-        each(LOC, function(val, key) {
-            LOC[key] += slot * 0x10;
-        });
+        debug('Thunderclock card in slot', slot);
     }
-
-    var auxRomFn = {
-        start: function auxRom_start() {
-            return 0xc8;
-        },
-        end: function auxRom_end() {
-            return 0xcf;
-        },
-        read: function auxRom_read(page, off) {
-            return rom[(page - 0xc8) * 256 + off];
-        },
-        write: function auxRom_write() {}
-    };
 
     var _command = 0;
     var _bits = [];
@@ -335,7 +322,7 @@ function Thunderclock(mmu, io, slot)
     }
 
     function _access(off, val) {
-        switch (off) {
+        switch (off & 0x8F) {
         case LOC.CONTROL:
             if (val !== undefined) {
                 if ((val & FLAGS.STROBE) !== 0) {
@@ -368,20 +355,16 @@ function Thunderclock(mmu, io, slot)
     _init();
 
     return {
-        start: function thunderclock_start() {
-            io.registerSwitches(this, LOC);
-            return 0xc0 + slot;
-        },
-        end: function thunderclock_end() {
-            return 0xc0 + slot;
-        },
         read: function thunderclock_read(page, off) {
-            mmu.auxRom(slot, auxRomFn);
-
-            return rom[off];
+            var result;
+            if (page < 0xc8) {
+                result = rom[off];
+            } else {
+                result = rom[(page - 0xc8) << 8 | off];
+            }
+            return result;
         },
         write: function thunderclock_write() {
-            mmu.auxRom(slot, auxRomFn);
         },
         ioSwitch: function thunderclock_ioSwitch(off, val) {
             return _access(off, val);

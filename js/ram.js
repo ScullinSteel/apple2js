@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2016 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -17,6 +17,8 @@ var base64_encode = Base64.encode;
 var base64_decode = Base64.decode;
 
 function RAM(sp, ep) {
+    'use strict';
+
     var mem;
     var start_page = sp;
     var end_page = ep;

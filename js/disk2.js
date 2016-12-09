@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2016 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -15,7 +15,6 @@ var events = require('events');
 
 var debug = require('debug')('apple2js:disk2');
 var bytify = Util.bytify;
-var each = require('lodash/each');
 
 var base64_decode = Base64.decode;
 var base64_encode = Base64.encode;
@@ -54,7 +53,7 @@ function DiskII(io, slot)
     var _drive = 1;
     var _cur = _drives[_drive - 1];
     var _emitter = new events.EventEmitter();
-    
+
     var LOC = {
         // Disk II Stuff
         PHASE0OFF: 0x80,
@@ -75,12 +74,12 @@ function DiskII(io, slot)
         DRIVEREADMODE: 0x8E, // Q7L
         DRIVEWRITEMODE: 0x8F // Q7H
     };
-    
+
 //    var DO = [0x0,0x7,0xE,0x6,0xD,0x5,0xC,0x4,
 //              0xB,0x3,0xA,0x2,0x9,0x1,0x8,0xF];
     var _DO = [0x0,0xD,0xB,0x9,0x7,0x5,0x3,0x1,
                0xE,0xC,0xA,0x8,0x6,0x4,0x2,0xF];
-    
+
 //    var PO = [0x0,0x8,0x1,0x9,0x2,0xa,0x3,0xb,
 //              0x4,0xc,0x5,0xd,0x6,0xe,0x7,0xf];
     var _PO = [0x0,0x2,0x4,0x6,0x8,0xa,0xc,0xe,
@@ -113,15 +112,13 @@ function DiskII(io, slot)
                     0x00, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F];
 
     function _init() {
-        each(LOC, function(val, key) {
-            LOC[key] += slot * 0x10;
-        });
+        debug('Disk ][ in slot', slot);
     }
 
     /**
-     * From Beneath Apple DOS 
+     * From Beneath Apple DOS
      */
-    
+
     function _fourXfour(val) {
         var xx = val & 0xaa;
         var yy = val & 0x55;
@@ -173,7 +170,7 @@ function DiskII(io, slot)
         /*
          * Gap 2 (5 bytes)
          */
-        
+
         for (idx = 0; idx < 0x05; idx++) {
             buf.push(0xff);
         }
@@ -183,34 +180,34 @@ function DiskII(io, slot)
          */
 
         buf = buf.concat([0xd5, 0xaa, 0xad]); // Data Prolog D5 AA AD
- 
+
         var nibbles = [];
         var ptr2 = 0;
         var ptr6 = 0x56;
         var idx2, idx6;
-        
+
         for (idx = 0; idx < 0x156; idx++) {
             nibbles[idx] = 0;
         }
-        
+
         idx2 = 0x55;
         for (idx6 = 0x101; idx6 >= 0; idx6--) {
             var val6 = data[idx6 % 0x100];
             var val2 = nibbles[ptr2 + idx2];
-            
+
             val2 = (val2 << 1) | (val6 & 1);
             val6 >>= 1;
             val2 = (val2 << 1) | (val6 & 1);
             val6 >>= 1;
-            
+
             nibbles[ptr6 + idx6] = val6;
             nibbles[ptr2 + idx2] = val2;
-            
+
             if (--idx2 < 0) {
                 idx2 = 0x55;
             }
         }
-        
+
         var last = 0;
         for (idx = 0; idx < 0x156; idx++) {
             var val = nibbles[idx];
@@ -218,13 +215,13 @@ function DiskII(io, slot)
             last = val;
         }
         buf.push(_trans[last]);
-        
+
         buf = buf.concat([0xde, 0xaa, 0xeb]); // Epilog DE AA EB
-        
+
         /*
          * Gap 3
          */
-        
+
         buf.push(0xff);
 
         return buf;
@@ -248,8 +245,8 @@ function DiskII(io, slot)
         return JSON.stringify({'type': format,
                                'encoding': 'base64',
                                'volume': cur.volume,
-                               'data': data}, 
-                               null, 
+                               'data': data},
+                               null,
                                pretty ? '    ' : null);
     }
 
@@ -265,14 +262,14 @@ function DiskII(io, slot)
                 var d = base64_decode(json.data[t][_s]);
                 track = track.concat(_explodeSector(v, t, _DO[_s], d));
             }
-            tracks[t] = bytify(track); 
+            tracks[t] = bytify(track);
         }
         _cur.volume = v;
         _cur.format = json.type;
         _cur.tracks = tracks;
     }
 
-    function _readNext() { 
+    function _readNext() {
         var result = 0;
         if (_skip || _writeMode) {
             var t = _cur.tracks[_cur.track >> 1];
@@ -288,8 +285,8 @@ function DiskII(io, slot)
                 }
                 ++_cur.head;
             }
-        } 
-        _skip = (++_skip % 4); 
+        }
+        _skip = (++_skip % 4);
         return result;
     }
 
@@ -395,7 +392,7 @@ function DiskII(io, slot)
                         [-1, 0, 1, 2],
                         [-2,-1, 0, 1],
                         [ 1,-2,-1, 0]];
-    
+
     function setPhase(phase, on) {
         debug('phase ' + phase + (on ? ' on' : ' off'));
         if (on) {
@@ -409,16 +406,16 @@ function DiskII(io, slot)
                 _cur.track = 0x0;
             }
 
-            /* debug('Drive ' + _drive + 
-                   ', track ' + Util.toHex(_cur.track >> 1) + 
-                   ' (' + Util.toHex(_cur.track) + ')' + 
+            /* debug('Drive ' + _drive +
+                   ', track ' + Util.toHex(_cur.track >> 1) +
+                   ' (' + Util.toHex(_cur.track) + ')' +
                    ' [' + (_cur.track % 4) + '/' + phase + ']'); */
         }
     }
 
     function _access(off, val) {
         var result = 0;
-        switch (off) {
+        switch (off & 0x8f) {
         case LOC.PHASE0OFF:
             setPhase(0, false);
             break;
@@ -443,7 +440,7 @@ function DiskII(io, slot)
         case LOC.PHASE3ON:
             setPhase(3, true);
             break;
-            
+
         case LOC.DRIVEOFF:
             debug('Drive Off');
             _on = false;
@@ -454,7 +451,7 @@ function DiskII(io, slot)
             _on = true;
             _emitter.emit('driveLight', _drive, _on);
             break;
-            
+
         case LOC.DRIVE1:
             debug('Disk 1');
             _drive = 1;
@@ -473,12 +470,12 @@ function DiskII(io, slot)
                 _emitter.emit('driveLight', 2, true);
             }
             break;
-            
+
         case LOC.DRIVEREAD:
             result = _readNext();
             // debug('read: ' + Util.toHex(result));
             break;
-            
+
         case LOC.DRIVEWRITE:
             // debug('write: ' + Util.toHex(val));
             if (val !== undefined) {
@@ -578,20 +575,16 @@ function DiskII(io, slot)
     _init();
 
     return {
-        start: function disk2_start() {
-            io.registerSwitches(this, LOC);
-            return 0xc0 + slot;
-        },
-        end: function disk2_end() {
-            return 0xc0 + slot;
-        },
         ioSwitch: function disk2_ioSwitch(off, val) {
             return _access(off, val);
         },
+
         read: function disk2_read(page, off) {
             return diskII[off];
         },
+
         write: function disk2_write() {},
+
         reset: function disk2_reset() {
             if (_on) {
                 _writeMode = false;
@@ -599,6 +592,7 @@ function DiskII(io, slot)
                 _emitter.emit('driveLight', _drive, false);
             }
         },
+
         getState: function disk2_getState() {
             function getDriveState(drive) {
                 var result = {
@@ -647,7 +641,7 @@ function DiskII(io, slot)
                 return result;
             }
             state.drives.forEach(function(drive, idx) {
-                _drives[idx] = setDriveState(state);
+                _drives[idx] = setDriveState(drive);
             });
             _skip = state.skip;
             _latch = state.latch;
@@ -698,11 +692,17 @@ function DiskII(io, slot)
                     for (s = 0; s < data[t].length; s++) {
                         var _s = 15 - s;
                         if (fmt === 'po') { // ProDOS Order
-                            track = track.concat(_explodeSector(v, t, _PO[s], data[t][s]));
+                            track = track.concat(
+                                _explodeSector(v, t, _PO[s], data[t][s])
+                            );
                         } else if (fmt === 'dsk') { // DOS Order
-                            track = track.concat(_explodeSector(v, t, _DO[_s], data[t][_s]));
+                            track = track.concat(
+                                _explodeSector(v, t, _DO[_s], data[t][_s])
+                            );
                         } else { // flat
-                            track = track.concat(_explodeSector(v, t, s, data[t][s]));
+                            track = track.concat(
+                                _explodeSector(v, t, s, data[t][s])
+                            );
                         }
                     }
                 }
@@ -710,7 +710,6 @@ function DiskII(io, slot)
             }
             cur.tracks = tracks;
             _updateDirty(_drive, false);
-            return true;
         },
         getJSON: function disk2_getJSON(drive, pretty) {
             return _json_encode(drive, pretty);
@@ -729,9 +728,9 @@ function DiskII(io, slot)
             _cur.readOnly = false;
             if (fmt === '2mg') {
                 // Standard header size is 64 bytes. Make assumptions.
-                var prefix = new Uint8Array(data.slice(0, 64));
+                var prefix = data.slice(0, 64);
                 data = data.slice(64);
-                
+
                 // Check image format.
                 // Sure, it's really 64 bits. But only 2 are actually used.
                 switch (prefix[0xc]) {
@@ -748,7 +747,7 @@ function DiskII(io, slot)
                     fmt = 'dsk';
                     break;
                 }
-                var flags = 
+                var flags =
                     prefix[0x10] | (prefix[0x11] << 8) |
                     (prefix[0x12] << 16) | (prefix[0x13] << 24);
                 _cur.readOnly = (flags & 0x80000000) !== 0;
@@ -762,19 +761,23 @@ function DiskII(io, slot)
                 var track, off, d;
                 if (fmt === 'nib') {
                     off = t * 0x1a00;
-                    track = new Uint8Array(data.slice(off, off + 0x1a00));
+                    track = data.slice(off, off + 0x1a00);
                 } else {
                     track = [];
                     for (var s = 0; s < 16; s++) {
                         var _s = 15 - s;
                         if (fmt == 'po') { // ProDOS Order
-                            off = (16 * t + s) * 256; 
-                            d = new Uint8Array(data.slice(off, off + 256));
-                            track = track.concat(_explodeSector(v, t, _PO[s], d));
+                            off = (16 * t + s) * 256;
+                            d = data.slice(off, off + 256);
+                            track = track.concat(
+                                _explodeSector(v, t, _PO[s], d)
+                            );
                         } else if (fmt == 'dsk') { // DOS Order
-                            off = (16 * t + _s) * 256; 
-                            d = new Uint8Array(data.slice(off, off + 256));
-                            track = track.concat(_explodeSector(v, t, _DO[_s], d));
+                            off = (16 * t + _s) * 256;
+                            d = data.slice(off, off + 256);
+                            track = track.concat(
+                                _explodeSector(v, t, _DO[_s], d)
+                            );
                         } else {
                             return false;
                         }
@@ -793,9 +796,9 @@ function DiskII(io, slot)
         getBinary: function disk2_getBinary(drive) {
             var cur = _drives[drive - 1];
             var len = (16 * cur.tracks.length * 256);
-            var data = new Uint8Array(len);
+            var data = new Array(len);
             var idx = 0;
-          
+
             for (var t = 0; t < cur.tracks.length; t++) {
                 if (cur.format === 'nib') {
                     data[idx++] = cur.tracks[t];

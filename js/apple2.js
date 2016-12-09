@@ -1,9 +1,9 @@
 var CPU6502 = require('cpu6502');
 var RAM = require('./ram');
+var charset = require('./charroms/apple2echar').charset;
 var canvas2 = require('./canvas2');
 var canvas2e = require('./canvas2e');
 var Apple2IO = require('./apple2io');
-var Slot3 = require('./slot3');
 var DiskII = require('./disk2');
 var LanguageCard = require('./langcard');
 var MMU = require('./mmu');
@@ -14,10 +14,10 @@ var runTimer;
 var _requestAnimationFrame;
 
 if (typeof window !== 'undefined') {
-    _requestAnimationFrame = 
-        window.requestAnimationFrame || 
+    _requestAnimationFrame =
+        window.requestAnimationFrame ||
         window.mozRequestAnimationFrame ||
-        window.webkitRequestAnimationFrame || 
+        window.webkitRequestAnimationFrame ||
         window.msRequestAnimationFrame;
 }
 
@@ -31,12 +31,12 @@ function AppleII(options) {
         if (runTimer) {
             clearInterval(runTimer);
         }
-        
+
         var ival = 30;
         var stepMax = kHz * ival * 1.25;
-        
+
         var now, last = Date.now();
-        var runFn = function() { 
+        var runFn = function() {
             now = Date.now();
 
             var step = (now - last) * kHz;
@@ -44,16 +44,16 @@ function AppleII(options) {
             if (step > stepMax) {
                 step = stepMax;
             }
-            
+
             cpu.stepCycles(step);
             vm.blit();
             io.sampleTick();
-            
+
             if (_requestAnimationFrame) {
                 _requestAnimationFrame(runFn);
             }
         };
-        
+
         if (_requestAnimationFrame) {
             _requestAnimationFrame(runFn);
         } else {
@@ -61,32 +61,31 @@ function AppleII(options) {
         }
     }
 
-    var cpu = new CPU6502();
+    var cpu = new CPU6502({'65C02': true});
 
-    var lores1 = new LoresPage(1);
-    var lores2 = new LoresPage(2);
+    var lores1 = new LoresPage(1, charset);
+    var lores2 = new LoresPage(2, charset);
     var hires1 = new HiresPage(1);
     var hires2 = new HiresPage(2);
-    
+
     var vm = new VideoModes(lores1, hires1, lores2, hires2);
     var io = new Apple2IO(cpu, vm);
 
     var disk2 = new DiskII(io, 6);
+    var thunderclock = new Thunderclock(io, 7);
 
-    var lc;
     var mmu;
-    
+
     if (options.e) {
         mmu = new MMU(cpu, vm, lores1, lores2, hires1, hires2, io, options.rom);
-    } else {
-        lc = new LanguageCard(io, options.rom);
-    }
 
-    if (!options.e) {
+        cpu.addPageHandler(mmu);
+    } else {
         var ram1 = new RAM(0x00, 0x04);
         var ram2 = new RAM(0x0C, 0x1F);
         var ram3 = new RAM(0x60, 0xBF);
-        
+        var lc = new LanguageCard(io, 0, options.rom);
+
         cpu.addPageHandler(ram1);
         cpu.addPageHandler(lores1);
         cpu.addPageHandler(lores2);
@@ -95,21 +94,11 @@ function AppleII(options) {
         cpu.addPageHandler(hires2);
         cpu.addPageHandler(ram3);
         cpu.addPageHandler(io);
-    }
-
-    if (options.e) {
-        var slot3 = new Slot3(mmu, options.rom);
-        var thunderclock = new Thunderclock(mmu, io, 7);
-
-        mmu.addSlot(3, slot3);
-        mmu.addSlot(6, disk2);
-        mmu.addSlot(7, thunderclock);
-
-        cpu.addPageHandler(mmu);
-    } else {
         cpu.addPageHandler(lc);
-        cpu.addPageHandler(disk2);
     }
+
+    io.setSlot(6, disk2);
+    io.setSlot(7, thunderclock);
 
     var screen = options.screenCanvas;
     var context = screen.getContext('2d');

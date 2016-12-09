@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 Will Scullin <scullin@scullinsteel.com>
+/* Copyright 2010-2016 Will Scullin <scullin@scullinsteel.com>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -10,9 +10,11 @@
  */
 
 var RAM = require('./ram');
+var debug = require('debug')('apple2js:langcard');
 
-function LanguageCard(io, rom) {
-    var _io = io;
+function LanguageCard(io, slot, rom) {
+    'use strict';
+
     var _rom = rom;
     var _bank1 = null;
     var _bank2 = null;
@@ -31,6 +33,8 @@ function LanguageCard(io, rom) {
     var _write2 = null;
 
     function _init() {
+        debug('Language card in slot', slot);
+
         _bank1 = new RAM(0xd0, 0xdf);
         _bank2 = new RAM(0xd0, 0xdf);
         _ram = new RAM(0xe0, 0xff);
@@ -103,7 +107,7 @@ function LanguageCard(io, rom) {
             _debug('Bank 2 Off');
             break;
         case LOC.READWRBSR2:
-        case LOC._READWRBSR2: 
+        case LOC._READWRBSR2:
             _readbsr = true;
             _writebsr = ((_last & 0xF3) == (off & 0xF3));
             _bsr2 = true;
@@ -138,9 +142,9 @@ function LanguageCard(io, rom) {
             _bsr2 = false;
             _debug('Bank 1 Read/Write');
             break;
-            
+
         case LOC.BSRBANK2:
-            result = _bsr2 ? 0x80 : 0x00; 
+            result = _bsr2 ? 0x80 : 0x00;
             _debug('Bank 2 Read ' + _bsr2);
             break;
         case LOC.BSRREADRAM:
@@ -170,9 +174,9 @@ function LanguageCard(io, rom) {
 
         return result;
     }
+
     return {
         start: function() {
-            _io.registerSwitches(this, LOC);
             return 0xd0;
         },
         end: function() {
