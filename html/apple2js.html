@@ -37,7 +37,7 @@
         function updateHash() {
             var hash = document.location.hash;
             if (hash) {
-                var urls = hash.substr(1).split(',')
+                var urls = hash.substr(1).split('|')
                 for (var idx = 0; idx < urls.length; idx++) {
                     main.loadHTTP(urls[idx], idx + 1);
                 }
