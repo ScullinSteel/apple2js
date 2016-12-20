@@ -2,6 +2,7 @@
 
 use MIME::Base64 qw(encode_base64);
 use Getopt::Std;
+use strict;
 
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
 
@@ -14,7 +15,7 @@ sub HELP_MESSAGE() {
 };
 sub VERSION_MESSAGE() { my $fh = shift; print $fh "Version 1.0\n" };
 
-open(DISK, $ARGV[0]) or die $!;
+DISK = open($ARGV[0]) or die $!;
 binmode(DISK);
 
 my ($name, $ext) = $ARGV[0] =~ /([^\/]+)\.(dsk|po|2mg)$/i;
