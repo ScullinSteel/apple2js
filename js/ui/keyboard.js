@@ -155,17 +155,19 @@ function KeyBoard(io) {
         0xFF: [0xFF, 0xFF, 0xFF] // No comma line
     };
 
-    var keys =
-        [[['esc','1','2','3','4','5','6','7','8','9','0','-','=','delete'],
-          ['tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
-          ['ctrl','A','S','D','F','G','H','J','K','L',';','\'','return'],
-          ['shift','Z','X','C','V','B','N','M',',','.','/','shift'],
-          ['lock','`','pow','open-apple','&nbsp;','closed-apple','&larr;','&rarr;','&darr;','&uarr;']],
-         [['esc','!','@','#','$','%','^','&','*','(',')','_','+','delete'],
-          ['tab','Q','W','E','R','T','Y','U','I','O','P','{','}','|'],
-          ['ctrl','A','S','D','F','G','H','J','K','L',':','"','return'],
-          ['shift','Z','X','C','V','B','N','M','<','>','?','shift'],
-          ['caps','~','pow','open-apple','&nbsp;','closed-apple','&larr;','&rarr;','&darr;','&uarr;']]];
+    var keys = [[
+        ['esc','1','2','3','4','5','6','7','8','9','0','-','=','delete'],
+        ['tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
+        ['ctrl','A','S','D','F','G','H','J','K','L',';','\'','return'],
+        ['shift','Z','X','C','V','B','N','M',',','.','/','shift'],
+        ['lock','`','pow','open-apple','&nbsp;','closed-apple','&larr;','&rarr;','&darr;','&uarr;']
+    ], [
+        ['esc','!','@','#','$','%','^','&','*','(',')','_','+','delete'],
+        ['tab','Q','W','E','R','T','Y','U','I','O','P','{','}','|'],
+        ['ctrl','A','S','D','F','G','H','J','K','L',':','"','return'],
+        ['shift','Z','X','C','V','B','N','M','<','>','?','shift'],
+        ['caps','~','pow','open-apple','&nbsp;','closed-apple','&larr;','&rarr;','&darr;','&uarr;']
+    ]];
 
     var shifted = false;
     var controlled = false;

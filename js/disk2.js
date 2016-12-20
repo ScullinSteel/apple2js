@@ -9,6 +9,8 @@
  * implied warranty.
  */
 
+/*global Uint8Array */
+
 var Util = require('./util');
 var Base64 = require('./base64');
 var events = require('events');
@@ -784,13 +786,13 @@ function DiskII(io, slot)
                         var _s = 15 - s;
                         if (fmt == 'po') { // ProDOS Order
                             off = (16 * t + s) * 256;
-                            d = data.slice(off, off + 256);
+                            d = new Uint8Array(data.slice(off, off + 256));
                             track = track.concat(
                                 _explodeSector(v, t, _PO[s], d)
                             );
                         } else if (fmt == 'dsk') { // DOS Order
                             off = (16 * t + _s) * 256;
-                            d = data.slice(off, off + 256);
+                            d = new Uint8Array(data.slice(off, off + 256));
                             track = track.concat(
                                 _explodeSector(v, t, _DO[_s], d)
                             );

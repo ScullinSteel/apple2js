@@ -12,17 +12,18 @@ window.debugLib = debugLib;
 
 var screen = document.querySelector('#screen');
 
-var main = new AppleII({
+var apple2 = new AppleII({
     e: true,
     screenCanvas: screen,
     rom: new ROM()
 });
 
-var cpu = window.cpu = main.getCPU();
+var cpu = window.cpu = apple2.getCPU();
 
-var io = main.getIO();
-var disk2 = main.getDiskII();
-var dbg = main.getDebugger();
+var io = apple2.getIO();
+var disk2 = apple2.getDiskII();
+var smartport = apple2.getSmartPort();
+var dbg = apple2.getDebugger();
 
 // Gamepad Input
 gamepad.initGamepad(io);
@@ -79,9 +80,16 @@ function loadHTTP(url, drive) {
             var json;
             try {
                 json = JSON.parse(req.responseText);
-                if (disk2.setDisk(drive, json)) {
-                    label.innerHTML = json.name;
-                    gamepad.updateGamepadMap(json.gamepad);
+                if (json.blocks) {
+                    if (smartport.setDisk(drive, json)) {
+                        label.innerHTML = json.name;
+                        gamepad.updateGamepadMap(json.gamepad);
+                    }
+                } else {
+                    if (disk2.setDisk(drive, json)) {
+                        label.innerHTML = json.name;
+                        gamepad.updateGamepadMap(json.gamepad);
+                    }
                 }
             } catch (e) {
                 alert('Sorry, couldn\'t read "' + url + '"');
@@ -91,9 +99,16 @@ function loadHTTP(url, drive) {
         req.responseType = 'arraybuffer';
 
         req.onload = function() {
-            if (disk2.setBinary(drive, name, ext, req.response)) {
-                label.innerHTML = name;
-                gamepad.updateGamepadMap();
+            if (req.response.byteLength >= 400 * 1024) { // 400K and up uses smartport
+                if (smartport.setBinary(drive, req.response)) {
+                    label.innerHTML = name;
+                    gamepad.updateGamepadMap();
+                }
+            } else {
+                if (disk2.setBinary(drive, name, ext, req.response)) {
+                    label.innerHTML = name;
+                    gamepad.updateGamepadMap();
+                }
             }
         };
 

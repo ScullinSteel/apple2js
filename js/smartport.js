@@ -9,6 +9,8 @@
  * implied warranty.
  */
 
+/*global Uint8Array */
+
 var debug = require('debug')('apple2js:smartport');
 var debugBlocks = require('debug')('apple2js:smartport:blocks');
 var Base64 = require('./base64');
@@ -56,10 +58,6 @@ function SmartPort(io, slot, cpu) {
             disks[unit][idx] = base64_decode(disk.blocks[idx]);
         }
     }
-
-    // decodeDisk(1, require('json!../json/disks/appleworks.json'));
-    // decodeDisk(1, require('json!../json/disks/neuromancer.json'));
-    decodeDisk(1, require('json!../json/disks/games.json'));
 
     function Address() {
         var lo;
@@ -132,6 +130,7 @@ function SmartPort(io, slot, cpu) {
         var result = '';
         var b;
         var jdx;
+
         for (var idx = 0; idx < 32; idx++) {
             result += toHex(idx << 4, 4) + ': ';
             for (jdx = 0; jdx < 16; jdx++) {
@@ -185,6 +184,11 @@ function SmartPort(io, slot, cpu) {
         debug('read buffer=' + buffer);
         debug('read block=$' + toHex(block));
 
+        if (!disks[drive] || !disks[drive].length) {
+            debug('Drive', drive, 'is empty');
+            return;
+        }
+
         if (debugBlocks.enabled) {
             debugBlocks('read', '\n' + dumpBlock(drive, block));
         }
@@ -206,6 +210,11 @@ function SmartPort(io, slot, cpu) {
         debug('write drive=' + drive);
         debug('write buffer=' + buffer);
         debug('write block=$' + toHex(block));
+
+        if (!disks[drive] || !disks[drive].length) {
+            debug('Drive', drive, 'is empty');
+            return;
+        }
 
         if (debugBlocks.enabled) {
             debugBlocks('write', '\n' + dumpBlock(drive, block));
@@ -408,6 +417,17 @@ function SmartPort(io, slot, cpu) {
         },
 
         setState: function() {
+        },
+
+        setBinary: function (drive, data) {
+            disks[drive] = [];
+            for (var idx = 0; idx < data.byteLength; idx += 512) {
+                disks[drive].push(new Uint8Array(data.slice(idx, idx + 512)));
+            }
+        },
+
+        setDisk: function(drive, json) {
+            decodeDisk(drive, json);
         }
     };
 }

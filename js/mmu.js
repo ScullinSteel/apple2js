@@ -617,6 +617,7 @@ function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
             debug('reset');
             _initSwitches();
             _updateBanks();
+            io.reset();
         },
         read: function mmu_read(page, off, debug) {
             return _readPages[page].read(page, off, debug);

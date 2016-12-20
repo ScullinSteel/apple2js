@@ -15,8 +15,8 @@ sub HELP_MESSAGE() {
 };
 sub VERSION_MESSAGE() { my $fh = shift; print $fh "Version 1.0\n" };
 
-DISK = open($ARGV[0]) or die $!;
-binmode(DISK);
+open(my $disk, $ARGV[0]) or die $!;
+binmode($disk);
 
 my ($name, $ext) = $ARGV[0] =~ /([^\/]+)\.(dsk|po|2mg)$/i;
 my $rv;
@@ -40,7 +40,7 @@ my $offset = 0;
 
 if ($ext eq '2mg') {
     # Format
-    $offset += read(DISK, $buffer, 0x04);
+    $offset += read($disk, $buffer, 0x04);
     $tmp = unpack("a[4]", $buffer);
     if ($tmp ne '2IMG') {
         print STDERR "Invalid format";
@@ -48,16 +48,16 @@ if ($ext eq '2mg') {
     }
 
     # Creator
-    $offset += read(DISK, $buffer, 0x04);
+    $offset += read($disk, $buffer, 0x04);
     $tmp = unpack("a[4]", $buffer);
     print STDERR "Creator: " . $tmp . "\n";
 
     # Header Length
-    $offset += read(DISK, $buffer, 0x02);
+    $offset += read($disk, $buffer, 0x02);
     my $header_length = unpack("v", $buffer);
 
     # Version Number
-    $offset += read(DISK, $buffer, 0x02);
+    $offset += read($disk, $buffer, 0x02);
     my $version_number = unpack("v", $buffer);
     if ($version_number != 1) {
         print STDERR "Unknown version: " . $version_number . "\n";
@@ -65,7 +65,7 @@ if ($ext eq '2mg') {
     }
 
     # Image Format
-    $offset += read(DISK, $buffer, 0x04);
+    $offset += read($disk, $buffer, 0x04);
     my $image_format = unpack("V", $buffer);
     if ($image_format == 0) {
         $ext = "dsk";
@@ -78,7 +78,7 @@ if ($ext eq '2mg') {
     print STDERR "Format: " . $ext . "\n";
 
     # Flags
-    $offset += read(DISK, $buffer, 0x04);
+    $offset += read($disk, $buffer, 0x04);
     my $flags = unpack("V", $buffer);
     if ($flags & 0x80000000) {
         $readOnly = 1;
@@ -87,18 +87,18 @@ if ($ext eq '2mg') {
         $volume = $flags & 0xff;
     }
 
-    $rv = read(DISK, $buffer, $header_length - $offset);
+    $rv = read($disk, $buffer, $header_length - $offset);
 }
 
 my $block = 0;
 print "[\n";
 for ($block = 0; $block < 1600; $block++) {
     print ",\n" if ($block != 0);
-    $rv = read(DISK, $buffer, 0x200);
+    $rv = read($disk, $buffer, 0x200);
     print "    \"";
     print encode_base64($buffer, "");
     print "\"";
 }
 print "\n]";
 
-close(DISK);
+close($disk);

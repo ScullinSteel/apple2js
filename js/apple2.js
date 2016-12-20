@@ -136,6 +136,10 @@ function AppleII(options) {
             return disk2;
         },
 
+        getSmartPort: function getSmartPort() {
+            return smartport;
+        },
+
         getIO: function getIO() {
             return io;
         },
