@@ -82,7 +82,8 @@ function AppleII(options) {
     var vm = new VideoModes(lores1, hires1, lores2, hires2);
     var io = new Apple2IO(cpu, vm);
 
-    var smartport = new SmartPort(cpu, 5);
+    var ramfactor = new RamFactor(io, 2, 1024 * 1024);
+    var smartport = new SmartPort(io, 5, cpu);
     var disk2 = new DiskII(io, 6);
     var thunderclock = new Thunderclock(io, 7);
 
@@ -109,6 +110,8 @@ function AppleII(options) {
         cpu.addPageHandler(lc);
     }
 
+    io.setSlot(2, ramfactor);
+    io.setSlot(5, smartport);
     io.setSlot(6, disk2);
     io.setSlot(7, thunderclock);
 
