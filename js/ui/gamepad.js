@@ -52,7 +52,7 @@ var DEFAULT_GAMEPAD = {
     'B': 1,
     'L1': 0,
     'R1': 1,
-    'START': '\033'
+    'START': '\u001b'
 };
 
 if (getGamepads) {
@@ -69,8 +69,8 @@ function processGamepad(io) {
         gamepad = getGamepads.call(navigator)[0];
     }
     if (gamepad) {
-        var x = (gamepad.axes[0] * 1.414 + 1) / 2.0; 
-        var y = (gamepad.axes[1] * 1.414 + 1) / 2.0; 
+        var x = (gamepad.axes[0] * 1.414 + 1) / 2.0;
+        var y = (gamepad.axes[1] * 1.414 + 1) / 2.0;
         io.paddle(0, flipX ? 1.0 - x : x);
         io.paddle(1, flipY ? 1.0 - y : y);
         var val;
@@ -85,7 +85,7 @@ function processGamepad(io) {
                 } else {
                     pressed = (button == 1.0);
                 }
-                
+
                 if (pressed && !old) {
                     if (val <= 0) {
                         io.buttonDown(-val);
@@ -112,6 +112,10 @@ module.exports = {
                 processGamepad(io);
             }, 100);
         }
+    },
+
+    gamepadActive: function gamepadActive() {
+        return gamepad != null;
     },
 
     updateGamepadMap: function updateGamepadMap(data) {

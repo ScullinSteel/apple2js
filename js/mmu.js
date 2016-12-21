@@ -186,9 +186,11 @@ function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
     var mem60_BF = [new RAM(0x60,0xBF), new RAM(0x60,0xBF)];
     var memC0_C0 = [switches];
     var memC1_CF = [io, auxRom];
-    var memD0_DF = [rom,
-                    new RAM(0xD0,0xDF), new RAM(0xD0,0xDF),
-                    new RAM(0xD0,0xDF), new RAM(0xD0,0xDF)];
+    var memD0_DF = [
+        rom,
+        new RAM(0xD0,0xDF), new RAM(0xD0,0xDF),
+        new RAM(0xD0,0xDF), new RAM(0xD0,0xDF)
+    ];
     var memE0_FF = [rom, new RAM(0xE0,0xFF), new RAM(0xE0,0xFF)];
 
     io.setSlot(3, auxRom);
@@ -615,6 +617,7 @@ function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
             debug('reset');
             _initSwitches();
             _updateBanks();
+            io.reset();
         },
         read: function mmu_read(page, off, debug) {
             return _readPages[page].read(page, off, debug);
@@ -645,8 +648,10 @@ function MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom)
                 mem02_03: [mem02_03[0].getState(), mem02_03[1].getState()],
                 mem0C_1F: [mem0C_1F[0].getState(), mem0C_1F[1].getState()],
                 mem60_BF: [mem60_BF[0].getState(), mem60_BF[1].getState()],
-                memD0_DF: [memD0_DF[0].getState(), memD0_DF[1].getState(),
-                           memD0_DF[2].getState(), memD0_DF[3].getState()],
+                memD0_DF: [
+                    memD0_DF[0].getState(), memD0_DF[1].getState(),
+                    memD0_DF[2].getState(), memD0_DF[3].getState()
+                ],
                 memE0_FF: [memE0_FF[0].getState(), memE0_FF[1].getState()]
             };
         },

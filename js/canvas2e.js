@@ -11,7 +11,7 @@
 
 var Util = require('./util');
 var Base64 = require('./base64');
-var debug = require('debug')('apple2js:canvas2');
+var debug = require('debug')('apple2js:canvas2e');
 
 var allocMemPages = Util.allocMemPages;
 var base64_decode = Base64.decode;
@@ -22,6 +22,7 @@ var textMode = true;
 var mixedMode = false;
 var hiresMode = false;
 var pageMode = 1;
+
 var _80colMode = false;
 var altCharMode = false;
 var doubleHiresMode = false;
@@ -363,8 +364,10 @@ function LoresPage(page, charset)
             return {
                 page: _page,
                 green: _greenMode,
-                buffer: [base64_encode(_buffer[0]),
-                         base64_encode(_buffer[1])]
+                buffer: [
+                    base64_encode(_buffer[0]),
+                    base64_encode(_buffer[1])
+                ]
             };
         },
         setState: function(state) {
@@ -390,25 +393,27 @@ function HiresPage(page)
 
     var _page = page;
 
-    var r4 = [0,   // Black
-              2,   // Dark Blue
-              4,   // Dark Green
-              6,   // Medium Blue
+    var r4 = [
+        0,   // Black
+        2,   // Dark Blue
+        4,   // Dark Green
+        6,   // Medium Blue
 
-              8,   // Brown
-              5,   // Gray 1
-              12,  // Light Green
-              14,  // Aqua
+        8,   // Brown
+        5,   // Gray 1
+        12,  // Light Green
+        14,  // Aqua
 
-              1,   // Red
-              3,   // Purple
-              10,  // Gray 2
-              7,  // Pink
+        1,   // Red
+        3,   // Purple
+        10,  // Gray 2
+        7,  // Pink
 
-              9,   // Orange
-              11,   // Light Blue
-              13,  // Yellow
-              15]; // White
+        9,   // Orange
+        11,   // Light Blue
+        13,  // Yellow
+        15
+    ]; // White
 
     var dcolors = [
         [0x00,0x00,0x00],  // black
@@ -569,6 +574,10 @@ function HiresPage(page)
                 if (doubleHiresMode) {
                     // Every 4 bytes is 7 pixels
                     // 2 bytes per bank
+
+                    // 76543210 76543210 76543210 76543210
+                    //  1111222  2333344  4455556  6667777
+
                     var mod = col % 2, mcol = col - mod;
                     bz = _buffer[0][base - mod - 1];
                     b0 = _buffer[1][base - mod];
@@ -576,24 +585,28 @@ function HiresPage(page)
                     b2 = _buffer[1][base - mod + 1];
                     b3 = _buffer[0][base - mod + 1];
                     b4 = _buffer[1][base - mod + 2];
-                    c = [0,
-                         ((b0 & 0x0f) >> 0), // 0
-                         ((b0 & 0x70) >> 4) | ((b1 & 0x01) << 3), // 1
-                         ((b1 & 0x1e) >> 1), // 2
-                         ((b1 & 0x60) >> 5) | ((b2 & 0x03) << 2), // 3
-                         ((b2 & 0x3c) >> 2), // 4
-                         ((b2 & 0x40) >> 6) | ((b3 & 0x07) << 1), // 5
-                         ((b3 & 0x78) >> 3), // 6
-                         0], // 7
-                    hb = [0,
-                          b0 & 0x80, // 0
-                          b0 & 0x80, // 1
-                          b1 & 0x80, // 2
-                          b2 & 0x80, // 3
-                          b2 & 0x80, // 4
-                          b3 & 0x80, // 5
-                          b3 & 0x80, // 6
-                          0]; // 7
+                    c = [
+                        0,
+                        ((b0 & 0x0f) >> 0), // 0
+                        ((b0 & 0x70) >> 4) | ((b1 & 0x01) << 3), // 1
+                        ((b1 & 0x1e) >> 1), // 2
+                        ((b1 & 0x60) >> 5) | ((b2 & 0x03) << 2), // 3
+                        ((b2 & 0x3c) >> 2), // 4
+                        ((b2 & 0x40) >> 6) | ((b3 & 0x07) << 1), // 5
+                        ((b3 & 0x78) >> 3), // 6
+                        0
+                    ], // 7
+                    hb = [
+                        0,
+                        b0 & 0x80, // 0
+                        b0 & 0x80, // 1
+                        b1 & 0x80, // 2
+                        b2 & 0x80, // 3
+                        b2 & 0x80, // 4
+                        b3 & 0x80, // 5
+                        b3 & 0x80, // 6
+                        0
+                    ]; // 7
                     if (col > 0) {
                         c[0] = (bz & 0x78) >> 3;
                         hb[0] = bz & 0x80;
@@ -677,12 +690,15 @@ function HiresPage(page)
                         evenCol = (hbs ? blueCol : violetCol);
 
                     off = dx * 4 + dy * 280 * 4 * 2;
+
+                    monoColor = _greenMode ? _green : null;
+
                     for (idx = 0; idx < 9; idx++, off += 8) {
                         val >>= 1;
 
                         if (v1) {
-                            if (_greenMode) {
-                                color = _green;
+                            if (monoColor) {
+                                color = monoColor;
                             } else if (highColorHGRMode) {
                                 color = dcolors[_buffer[1][base] >> 4];
                             } else if (v0 || v2) {
@@ -691,7 +707,7 @@ function HiresPage(page)
                                 color = odd ? oddCol : evenCol;
                             }
                         } else {
-                            if (_greenMode) {
+                            if (monoColor) {
                                 color = blackCol;
                             } else if (highColorHGRMode) {
                                 color = dcolors[_buffer[1][base] & 0x0f];
@@ -741,8 +757,10 @@ function HiresPage(page)
             return {
                 page: _page,
                 green: _greenMode,
-                buffer: [base64_encode(_buffer[0]),
-                         base64_encode(_buffer[1])]
+                buffer: [
+                    base64_encode(_buffer[0]),
+                    base64_encode(_buffer[1])
+                ]
             };
         },
         setState: function(state) {
@@ -827,7 +845,7 @@ function VideoModes(gr,hgr,gr2,hgr2) {
             hiresMode = on;
             highColorHGRMode = false;
 
-            _seq = (on ? 'H+' : 'H-');
+            _seq = on ? 'H+' : 'H-';
             // debug('_seq=', _seq);
 
             if (old != on) {

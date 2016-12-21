@@ -9,6 +9,8 @@
  * implied warranty.
  */
 
+/*global Uint8Array */
+
 if (!Date.now) {
     Date.now = function now() {
         return new Date().getTime();
@@ -86,6 +88,7 @@ function hup( url ) {
 }
 
 module.exports = {
+    allocMem: allocMem,
     allocMemPages: allocMemPages,
     bytify: bytify,
     toBinary: toBinary,

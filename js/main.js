@@ -5,23 +5,31 @@ var ROM = require('./roms/apple2enh');
 var AppleII = require('./apple2');
 var audio = require('./ui/audio');
 var gamepad = require('./ui/gamepad');
+var joystick = require('./ui/joystick');
 var KeyBoard = require('./ui/keyboard');
 
 window.debugLib = debugLib;
 
-var main = new AppleII({
+var screen = document.querySelector('#screen');
+
+var apple2 = new AppleII({
     e: true,
-    screenCanvas: document.querySelector('#screen'),
+    screenCanvas: screen,
     rom: new ROM()
 });
 
-var cpu = window.cpu = main.getCPU();
+var cpu = window.cpu = apple2.getCPU();
 
-var io = main.getIO();
-var disk2 = main.getDiskII();
+var io = apple2.getIO();
+var disk2 = apple2.getDiskII();
+var smartport = apple2.getSmartPort();
+var dbg = apple2.getDebugger();
 
 // Gamepad Input
 gamepad.initGamepad(io);
+
+// Joystick Input
+joystick.initJoystick(io, screen);
 
 // Audio Output
 audio.initAudio(io);
@@ -72,9 +80,16 @@ function loadHTTP(url, drive) {
             var json;
             try {
                 json = JSON.parse(req.responseText);
-                if (disk2.setDisk(drive, json)) {
-                    label.innerHTML = json.name;
-                    gamepad.updateGamepadMap(json.gamepad);
+                if (json.blocks) {
+                    if (smartport.setDisk(drive, json)) {
+                        label.innerHTML = json.name;
+                        gamepad.updateGamepadMap(json.gamepad);
+                    }
+                } else {
+                    if (disk2.setDisk(drive, json)) {
+                        label.innerHTML = json.name;
+                        gamepad.updateGamepadMap(json.gamepad);
+                    }
                 }
             } catch (e) {
                 alert('Sorry, couldn\'t read "' + url + '"');
@@ -84,9 +99,16 @@ function loadHTTP(url, drive) {
         req.responseType = 'arraybuffer';
 
         req.onload = function() {
-            if (disk2.setBinary(drive, name, ext, req.response)) {
-                label.innerHTML = name;
-                gamepad.updateGamepadMap();
+            if (req.response.byteLength >= 400 * 1024) { // 400K and up uses smartport
+                if (smartport.setBinary(drive, req.response)) {
+                    label.innerHTML = name;
+                    gamepad.updateGamepadMap();
+                }
+            } else {
+                if (disk2.setBinary(drive, name, ext, req.response)) {
+                    label.innerHTML = name;
+                    gamepad.updateGamepadMap();
+                }
             }
         };
 
@@ -112,5 +134,6 @@ disk2.addDriveLightListener(function(drive, on) {
 
 window.main = {
     loadHTTP: loadHTTP,
-    reset: reset 
+    reset: reset,
+    dbg: dbg
 };

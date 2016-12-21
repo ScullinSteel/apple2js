@@ -4,10 +4,13 @@ var charset = require('./charroms/apple2echar').charset;
 var canvas2 = require('./canvas2');
 var canvas2e = require('./canvas2e');
 var Apple2IO = require('./apple2io');
+var SmartPort = require('./smartport');
 var DiskII = require('./disk2');
 var LanguageCard = require('./langcard');
+var RamFactor = require('./ramfactor');
 var MMU = require('./mmu');
 var Thunderclock = require('./thunderclock');
+var Debugger = require('./debugger');
 
 var kHz = 1023;
 var runTimer;
@@ -22,6 +25,7 @@ if (typeof window !== 'undefined') {
 }
 
 function AppleII(options) {
+    var cpuDebugger;
     var canvas = options.e ? canvas2e : canvas2;
     var LoresPage = canvas.LoresPage;
     var HiresPage = canvas.HiresPage;
@@ -45,9 +49,16 @@ function AppleII(options) {
                 step = stepMax;
             }
 
-            cpu.stepCycles(step);
+            cpu.stepCycles(step, cpuDebugger.callback);
             vm.blit();
             io.sampleTick();
+
+            if (cpuDebugger.breakpoint) {
+                if (runTimer) {
+                    clearInterval(runTimer);
+                }
+                return;
+            }
 
             if (_requestAnimationFrame) {
                 _requestAnimationFrame(runFn);
@@ -71,6 +82,8 @@ function AppleII(options) {
     var vm = new VideoModes(lores1, hires1, lores2, hires2);
     var io = new Apple2IO(cpu, vm);
 
+    var ramfactor = new RamFactor(io, 2, 1024 * 1024);
+    var smartport = new SmartPort(io, 5, cpu);
     var disk2 = new DiskII(io, 6);
     var thunderclock = new Thunderclock(io, 7);
 
@@ -97,6 +110,8 @@ function AppleII(options) {
         cpu.addPageHandler(lc);
     }
 
+    io.setSlot(2, ramfactor);
+    io.setSlot(5, smartport);
     io.setSlot(6, disk2);
     io.setSlot(7, thunderclock);
 
@@ -105,6 +120,7 @@ function AppleII(options) {
 
     vm.setContext(context);
 
+    cpuDebugger = new Debugger(cpu);
     cpu.reset();
     run();
 
@@ -120,8 +136,16 @@ function AppleII(options) {
             return disk2;
         },
 
+        getSmartPort: function getSmartPort() {
+            return smartport;
+        },
+
         getIO: function getIO() {
             return io;
+        },
+
+        getDebugger: function getDebugger() {
+            return cpuDebugger;
         }
     };
 }
