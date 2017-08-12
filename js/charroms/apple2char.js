@@ -257,4 +257,6 @@ var charset = [
     0x80,0x9c,0xa2,0x84,0x88,0x88,0x80,0x88
 ];
 
-module.exports = charset;
+module.exports = {
+    charset: charset
+};

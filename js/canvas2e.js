@@ -42,7 +42,7 @@ var scanlines = false;
  *
  ***************************************************************************/
 
-function LoresPage(page, charset)
+function LoresPage(loresPage, charset)
 {
     'use strict';
 
@@ -50,7 +50,7 @@ function LoresPage(page, charset)
     // $40-$7F flashing
     // $80-$FF normal
 
-    var _page = page;
+    var _baseMem = loresPage * 0x400;
     var _buffer = [];
     var _refreshing = false;
     var _greenMode = false;
@@ -170,17 +170,18 @@ function LoresPage(page, charset)
         // These are used by both bank 0 and 1
 
         _start: function() {
-            return (0x04 * _page);
+            return (0x04 * loresPage);
         },
-        _end: function() { return (0x04 * _page) + 0x03; },
+        _end: function() { return (0x04 * loresPage) + 0x03; },
         _read: function(page, off, bank) {
             var addr = (page << 8) | off,
-                base = addr - 0x400 * _page;
+                base = addr - _baseMem;
             return _buffer[bank][base];
         },
+
         _write: function(page, off, val, bank) {
             var addr = (page << 8) | off,
-                base = addr - 0x400 * _page,
+                base = addr - _baseMem,
                 fore, back;
 
             if (_buffer[bank][base] == val && !_refreshing) {
@@ -199,7 +200,7 @@ function LoresPage(page, charset)
             var row = ab | cd | e;
             var b;
 
-            var data = pages[_page].data;
+            var data = pages[loresPage].data;
             if ((row < 24) && (col < 40)) {
                 if (!textMode && hiresMode && !(mixedMode && row > 19)) {
                     return;
@@ -330,7 +331,7 @@ function LoresPage(page, charset)
         },
 
         refresh: function() {
-            var addr = 0x400 * _page;
+            var addr = _baseMem;
             _refreshing = true;
             for (var idx = 0; idx < 0x400; idx++, addr++) {
                 this._write(addr >> 8, addr & 0xff, _buffer[0][idx], 0);
@@ -342,7 +343,7 @@ function LoresPage(page, charset)
         },
 
         blink: function() {
-            var addr = 0x400 * _page;
+            var addr = _baseMem;
             _refreshing = true;
             _blink = !_blink;
             for (var idx = 0; idx < 0x400; idx++, addr++) {
@@ -358,11 +359,10 @@ function LoresPage(page, charset)
             this.refresh();
         },
         blit: function() {
-            context.putImageData(pages[_page], 0, 0);
+            context.putImageData(pages[loresPage], 0, 0);
         },
         getState: function() {
             return {
-                page: _page,
                 green: _greenMode,
                 buffer: [
                     base64_encode(_buffer[0]),
@@ -371,7 +371,6 @@ function LoresPage(page, charset)
             };
         },
         setState: function(state) {
-            _page = state.page;
             _greenMode = state.green;
             _buffer[0] = base64_decode(state.buffer[0]);
             _buffer[1] = base64_decode(state.buffer[1]);
@@ -387,11 +386,11 @@ function LoresPage(page, charset)
  *
  ***************************************************************************/
 
-function HiresPage(page)
+function HiresPage(hiresPage)
 {
     'use strict';
 
-    var _page = page;
+    var _baseMem = 0x2000 * hiresPage;
 
     var r4 = [
         0,   // Black
@@ -412,8 +411,8 @@ function HiresPage(page)
         9,   // Orange
         11,   // Light Blue
         13,  // Yellow
-        15
-    ]; // White
+        15   // White
+    ];
 
     var dcolors = [
         [0x00,0x00,0x00],  // black
@@ -529,21 +528,30 @@ function HiresPage(page)
             };
         },
 
-        _start: function() { return (0x20 * _page); },
+        _start: function() { return (0x20 * hiresPage); },
 
-        _end: function() { return (0x020 * _page) + 0x1f; },
+        _end: function() { return (0x020 * hiresPage) + 0x1f; },
 
         _read: function(page, off, bank) {
-            var addr = (page << 8) | off, base = addr - 0x2000 * _page;
+            var addr = (page << 8) | off, base = addr - _baseMem;
             return _buffer[bank][base];
         },
 
         _write: function(page, off, val, bank) {
             function dim(c) {
-                return [c[0] * 0.75, c[1] * 0.75, c[2] * 0.75];
+                return [
+                    c[0] * 0.75 & 0xff,
+                    c[1] * 0.75 & 0xff,
+                    c[2] * 0.75 & 0xff
+                ];
             }
-            var addr = (page << 8) | off, base = addr - 0x2000 * _page,
+            var addr = (page << 8) | off, base = addr - _baseMem,
                 idx, jdx;
+
+            if ((base < 0) || (base >= 0x2000)) {
+                return;
+            }
+
             if (_buffer[bank][base] == val && !_refreshing) {
                 return;
             }
@@ -563,7 +571,7 @@ function HiresPage(page)
             var rowa = ab | cd | e,
                 rowb = base >> 10;
 
-            var dx, dy, data = pages[_page].data;
+            var dx, dy, data = pages[hiresPage].data;
             if ((rowa < 24) && (col < 40)) {
                 if (textMode || !hiresMode || (mixedMode && rowa > 19)) {
                     return;
@@ -575,6 +583,8 @@ function HiresPage(page)
                     // Every 4 bytes is 7 pixels
                     // 2 bytes per bank
 
+                    // b0       b1       b2       b3
+                    //  c0  c1    c2  c3    c4  c5    c6
                     // 76543210 76543210 76543210 76543210
                     //  1111222  2333344  4455556  6667777
 
@@ -648,19 +658,21 @@ function HiresPage(page)
                                 }
                             } else if (colorDHRMode) {
                                 _drawHalfPixel(data, off, dcolor);
-                            } else if (((bits & 0x3c) == 0x3c) ||
-                                       ((bits & 0xf0) == 0xf0) ||
-                                       ((bits & 0x1e) == 0x1e) ||
-                                       ((bits & 0x78) == 0x78)) {
+                            } else if (
+                                ((c[idx] != c[idx - 1]) && (c[idx] != c[idx + 1])) &&
+                                (((bits & 0x1c) == 0x1c) ||
+                                ((bits & 0x70) == 0x70) ||
+                                ((bits & 0x38) == 0x38))
+                            ) {
                                 _drawHalfPixel(data, off, whiteCol);
-                            } else if (((c[idx] == c[idx + 1]) &&
-                                        (bits & 0xf0)) ||
-                                       ((c[idx] == c[idx - 1]) &&
-                                        (bits & 0x01e)) ||
-                                       (bits & 0x10)) {
+                            } else if (
+                                (bits & 0x38) ||
+                                (c[idx] == c[idx + 1]) ||
+                                (c[idx] == c[idx - 1])
+                            ) {
                                 _drawHalfPixel(data, off, dcolor);
-                            } else if ((bits & 0x28) == 0x28) {
-                                _drawHalfPixel(data, off, dcolor);
+                            }  else if (bits & 0x28) {
+                                _drawHalfPixel(data, off, dim(dcolor));
                             } else {
                                 _drawHalfPixel(data, off, blackCol);
                             }
@@ -672,7 +684,7 @@ function HiresPage(page)
                         _refreshing = true;
                         var bb = bank ? 0 : 1;
                         for (var rr = addr - 1; rr <= addr + 1; rr++) {
-                            var vv = _buffer[bb][rr - 0x2000 * _page];
+                            var vv = _buffer[bb][rr - _baseMem];
                             this._write(rr >> 8, rr & 0xff, vv, bb);
                         }
                         _refreshing = false;
@@ -734,7 +746,7 @@ function HiresPage(page)
             }
         },
         refresh: function() {
-            var page, off, idx, addr = 0x2000 * _page;
+            var page, off, idx, addr = _baseMem;
             _refreshing = true;
             for (idx = 0; idx < 0x2000; idx++, addr++) {
                 page = addr >> 8;
@@ -751,11 +763,10 @@ function HiresPage(page)
             this.refresh();
         },
         blit: function() {
-            context.putImageData(pages[_page], 0, 0);
+            context.putImageData(pages[hiresPage], 0, 0);
         },
         getState: function() {
             return {
-                page: _page,
                 green: _greenMode,
                 buffer: [
                     base64_encode(_buffer[0]),
@@ -764,7 +775,6 @@ function HiresPage(page)
             };
         },
         setState: function(state) {
-            _page = state.page;
             _greenMode = state.green;
             _buffer[0] = base64_decode(state.buffer[0]);
             _buffer[1] = base64_decode(state.buffer[1]);
@@ -858,7 +868,7 @@ function VideoModes(gr,hgr,gr2,hgr2) {
 
             _seq += on ? 'D+' : 'D-';
             _seq = _seq.substr(0, 16);
-            // debug('_seq=', _seq);
+            debug('_seq=', _seq);
 
             if (on) {
                 if (_seq == 'T+D+') {
@@ -918,6 +928,9 @@ function VideoModes(gr,hgr,gr2,hgr2) {
         },
         isHires: function() {
             return hiresMode;
+        },
+        isDoubleHires: function() {
+            return doubleHiresMode;
         },
         is80Col: function() {
             return _80colMode;

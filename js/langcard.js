@@ -12,7 +12,7 @@
 var RAM = require('./ram');
 var debug = require('debug')('apple2js:langcard');
 
-function LanguageCard(io, slot, rom) {
+function LanguageCard(io, rom) {
     'use strict';
 
     var _rom = rom;
@@ -23,8 +23,7 @@ function LanguageCard(io, slot, rom) {
     var _readbsr = false;
     var _writebsr = false;
     var _bsr2 = false;
-
-    var _last = 0x00;
+    var _prewrite = false;
 
     var _read1 = null;
     var _read2 = null;
@@ -33,7 +32,7 @@ function LanguageCard(io, slot, rom) {
     var _write2 = null;
 
     function _init() {
-        debug('Language card in slot', slot);
+        debug('Language card');
 
         _bank1 = new RAM(0xd0, 0xdf);
         _bank2 = new RAM(0xd0, 0xdf);
@@ -47,7 +46,8 @@ function LanguageCard(io, slot, rom) {
     }
 
     function _debug() {
-        // debug.apply(arguments);
+        /*eslint no-console: 0 */
+        // console.debug.apply(null, arguments);
     }
 
     _init();
@@ -82,64 +82,81 @@ function LanguageCard(io, slot, rom) {
         _READWRBSR1: 0x8f
     };
 
-    function _access(off) {
+    function _access(off, val) {
+        var readMode = val === undefined;
         var result = 0;
         switch (off) {
-        case LOC.READBSR2:
-        case LOC._READBSR2:
+        case LOC.READBSR2: // 0xC080
+        case LOC._READBSR2: // 0xC084
             _readbsr = true;
             _writebsr = false;
             _bsr2 = true;
+            _prewrite = false;
             _debug('Bank 2 Read');
             break;
-        case LOC.WRITEBSR2:
-        case LOC._WRITEBSR2:
+        case LOC.WRITEBSR2: // 0xC081
+        case LOC._WRITEBSR2: // 0xC085
             _readbsr = false;
-            _writebsr = ((_last & 0xF3) == (off & 0xF3));
+            if (readMode) {
+                _writebsr = _prewrite;
+            }
             _bsr2 = true;
+            _prewrite = readMode;
             _debug('Bank 2 Write');
             break;
-        case LOC.OFFBSR2:
-        case LOC._OFFBSR2:
+        case LOC.OFFBSR2: // 0xC082
+        case LOC._OFFBSR2: // 0xC086
             _readbsr = false;
             _writebsr = false;
             _bsr2 = true;
+            _prewrite = false;
             _debug('Bank 2 Off');
             break;
-        case LOC.READWRBSR2:
-        case LOC._READWRBSR2:
+        case LOC.READWRBSR2: // 0xC083
+        case LOC._READWRBSR2: // 0xC087
             _readbsr = true;
-            _writebsr = ((_last & 0xF3) == (off & 0xF3));
+            if (readMode) {
+                _writebsr = _prewrite;
+            }
             _bsr2 = true;
+            _prewrite = readMode;
             _debug('Bank 2 Read/Write');
             break;
 
-        case LOC.READBSR1:
-        case LOC._READBSR1:
+        case LOC.READBSR1: // 0xC088
+        case LOC._READBSR1: // 0xC08C
             _readbsr = true;
             _writebsr = false;
             _bsr2 = false;
+            _prewrite = false;
             _debug('Bank 1 Read');
             break;
-        case LOC.WRITEBSR1:
-        case LOC._WRITEBSR1:
+        case LOC.WRITEBSR1: // 0xC089
+        case LOC._WRITEBSR1: // 0xC08D
             _readbsr = false;
-            _writebsr = ((_last & 0xF3) == (off & 0xF3));
+            if (readMode) {
+                _writebsr = _prewrite;
+            }
             _bsr2 = false;
+            _prewrite = readMode;
             _debug('Bank 1 Write');
             break;
-        case LOC.OFFBSR1:
-        case LOC._OFFBSR1:
+        case LOC.OFFBSR1: // 0xC08A
+        case LOC._OFFBSR1: // 0xC08E
             _readbsr = false;
             _writebsr = false;
             _bsr2 = false;
+            _prewrite = false;
             _debug('Bank 1 Off');
             break;
-        case LOC.READWRBSR1:
-        case LOC._READWRBSR1:
+        case LOC.READWRBSR1: // 0xC08B
+        case LOC._READWRBSR1: // 0xC08F
             _readbsr = true;
-            _writebsr = ((_last & 0xF3) == (off & 0xF3));
+            if (readMode) {
+                _writebsr = _prewrite;
+            }
             _bsr2 = false;
+            _prewrite = readMode;
             _debug('Bank 1 Read/Write');
             break;
 
@@ -154,7 +171,6 @@ function LanguageCard(io, slot, rom) {
         default:
             break;
         }
-        _last = off;
 
         if (_readbsr) {
             _read1 = _bsr2 ? _bank2 : _bank1;
@@ -206,7 +222,7 @@ function LanguageCard(io, slot, rom) {
                 readbsr: _readbsr,
                 writebsr: _writebsr,
                 bsr2: _bsr2,
-                last: _last,
+                prewrite: _prewrite,
                 bank1: _bank1.getState(),
                 bank2: _bank2.getState()
             };
@@ -218,7 +234,7 @@ function LanguageCard(io, slot, rom) {
             _bank1.setState(state.bank1);
             _bank2.setState(state.bank2);
             _access(-1);
-            _last = state.last;
+            _prewrite = state.prewrite;
         }
     };
 }

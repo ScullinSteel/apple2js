@@ -1,5 +1,6 @@
 
 var debug = require('debug')('apple2js:debugger');
+var SYMBOLS = require('./symbols');
 
 function Debugger(cpu) {
     var breakpoints = {};
@@ -15,7 +16,12 @@ function Debugger(cpu) {
             breakpoint = state.pc;
             return true;
         }
-        var line = cpu.dumpRegisters() + ' ' + cpu.dumpPC().substr(4);
+
+        var line = [
+            cpu.dumpRegisters(),
+            cpu.dumpPC(undefined, SYMBOLS).substr(4)
+        ].join(' ');
+
         if (tracing) {
             debug(line);
         } else {
@@ -38,6 +44,10 @@ function Debugger(cpu) {
             } else {
                 this.callback = null;
             }
+        },
+
+        getSkidmarks: function() {
+            return skidmarks;
         },
 
         setMaxSkidmarks: function(max) {

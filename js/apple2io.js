@@ -12,6 +12,7 @@
 var events = require('events');
 
 var debug = require('debug')('apple2js:io');
+var Util = require('./util');
 
 function Apple2IO(cpu, callbacks)
 {
@@ -25,6 +26,8 @@ function Apple2IO(cpu, callbacks)
     var _sample_size = 4096;
 
     var _cycles_per_sample = _hz / _rate;
+
+    var _vbEnd = 0;
 
     var _buffer = [];
     var _key = 0;
@@ -53,6 +56,7 @@ function Apple2IO(cpu, callbacks)
         SETALTCH: 0x0F, // set mousetext
         STROBE:   0x10, // clear bit 7 of keyboard data ($C000)
 
+        VERTBLANK: 0x19,// vertical blank
         RDTEXT:   0x1A, // using text mode
         RDMIXED:  0x1B, // using mixed mode
         RDPAGE2:  0x1C, // using text/graphics page2
@@ -86,10 +90,12 @@ function Apple2IO(cpu, callbacks)
         PADDLE1:  0x65, // bit 7: status of pdl-1 timer (read)
         PADDLE2:  0x66, // bit 7: status of pdl-2 timer (read)
         PADDLE3:  0x67, // bit 7: status of pdl-3 timer (read)
+        STATE:    0x68, // GS State register (ignored)
         PDLTRIG:  0x70, // trigger paddles
         BANK:     0x73, // Back switched RAM card bank
         SETIOUDIS:0x7E, // Enable double hires
-        CLRIOUDIS:0x7F  // Disable double hires
+        CLRIOUDIS:0x7F, // Disable double hires
+        RDDHIRES: 0x7F  // Read double hires status
     };
 
     function _tick() {
@@ -104,33 +110,33 @@ function Apple2IO(cpu, callbacks)
         }
     }
 
-    function _access(off) {
+    function _access(off, val) {
         var result = 0;
         var now = cpu.cycles();
         var delta = now - _trigger;
 
         switch (off) {
         case LOC.CLR80VID:
-            // debug('80 Column Mode off');
-            if ('_80col' in callbacks) {
+            if ('_80col' in callbacks && val !== undefined) {
+                debug('80 Column Mode off');
                 callbacks._80col(false);
             }
             break;
         case LOC.SET80VID:
-            // debug('80 Column Mode on');
-            if ('_80col' in callbacks) {
+            if ('_80col' in callbacks && val !== undefined) {
+                debug('80 Column Mode on');
                 callbacks._80col(true);
             }
             break;
         case LOC.CLRALTCH:
-            // debug('Alt Char off');
-            if ('altchar' in callbacks) {
+            if ('altchar' in callbacks && val !== undefined) {
+                debug('Alt Char off');
                 callbacks.altchar(false);
             }
             break;
         case LOC.SETALTCH:
-            // debug('Alt Char on');
-            if ('altchar' in callbacks) {
+            if ('altchar' in callbacks && val !== undefined) {
+                debug('Alt Char on');
                 callbacks.altchar(true);
             }
             break;
@@ -163,6 +169,10 @@ function Apple2IO(cpu, callbacks)
             break;
         case LOC.PAGE2:
             callbacks.page(2);
+            break;
+        case LOC.VERTBLANK:
+            // result = cpu.cycles() % 20 < 5 ? 0x80 : 0x00;
+            result = (cpu.cycles() < _vbEnd) ? 0x00 : 0x80;
             break;
         case LOC.RDTEXT:
             if ('isText' in callbacks) {
@@ -255,7 +265,7 @@ function Apple2IO(cpu, callbacks)
         case LOC.STROBE:
             _key &= 0x7f;
             if (_buffer.length > 0) {
-                var val =  _buffer.shift();
+                val =  _buffer.shift();
                 if (val == '\n') {
                     val = '\r';
                 }
@@ -287,8 +297,16 @@ function Apple2IO(cpu, callbacks)
         case LOC.PADDLE3:
             result = (delta < (_paddle[3] * 2756) ? 0x80 : 0x00);
             break;
+        case LOC.STATE:
+            // ignored
+            break;
         case LOC.PDLTRIG:
             _trigger = cpu.cycles();
+            break;
+        case LOC.RDDHIRES:
+            if ('isDoubleHires' in callbacks) {
+                result = callbacks.isDoubleHires() ? 0x80 : 0x0;
+            }
             break;
         case LOC.TAPEIN:
             // var flipped = false;
@@ -322,7 +340,15 @@ function Apple2IO(cpu, callbacks)
                 cb.progress(_progress);
             }
             */
+            break;
+        default:
+            debug('Unknown I/O', Util.toHex(off));
         }
+
+        if (val !== undefined) {
+            result = undefined;
+        }
+
         return result;
     }
 
@@ -400,7 +426,7 @@ function Apple2IO(cpu, callbacks)
 
             switch (page) {
             case 0xc0:
-                this.ioSwitch(off);
+                this.ioSwitch(off, val);
                 break;
             case 0xc1:
             case 0xc2:
@@ -481,8 +507,14 @@ function Apple2IO(cpu, callbacks)
             _cycles_per_sample = _hz / _rate;
         },
 
-        sampleTick: function sampleTick() {
+        tick: function tick() {
+            _vbEnd = cpu.cycles() + 1000;
             _tick();
+            emitter.emit('tick', cpu.cycles());
+        },
+
+        addTickListener: function addTickListener(cb) {
+            emitter.on('tick', cb);
         },
 
         addSampleListener: function addSampleListener(cb) {

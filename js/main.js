@@ -1,42 +1,57 @@
 var debugLib = require('debug');
 var debug = debugLib('apple2js:main');
-//var ROM = require('./roms/apple2');
-var ROM = require('./roms/apple2enh');
+
 var AppleII = require('./apple2');
-var audio = require('./ui/audio');
-var gamepad = require('./ui/gamepad');
-var joystick = require('./ui/joystick');
+var uiAudio = require('./ui/audio');
+var uiGamepad = require('./ui/gamepad');
+var uiJoystick = require('./ui/joystick');
 var KeyBoard = require('./ui/keyboard');
+
+var DiskII = require('./cards/disk2');
+var Mouse = require('./cards/mouse');
+var RamFactor = require('./cards/ramfactor');
+var SmartPort = require('./cards/smartport');
+var Thunderclock = require('./cards/thunderclock');
 
 window.debugLib = debugLib;
 
 var screen = document.querySelector('#screen');
 
 var apple2 = new AppleII({
-    e: true,
-    screenCanvas: screen,
-    rom: new ROM()
+    type: 'apple2enh',
+    screenCanvas: screen
 });
 
 var cpu = window.cpu = apple2.getCPU();
 
 var io = apple2.getIO();
-var disk2 = apple2.getDiskII();
-var smartport = apple2.getSmartPort();
+var ramfactor = new RamFactor(1024 * 1024);
+var mouse = new Mouse(cpu);
+var smartport = new SmartPort(cpu);
+var disk2 = new DiskII();
+var thunderclock = new Thunderclock();
 var dbg = apple2.getDebugger();
 
+io.setSlot(2, ramfactor);
+io.setSlot(4, mouse);
+io.setSlot(5, smartport);
+io.setSlot(6, disk2);
+io.setSlot(7, thunderclock);
+
 // Gamepad Input
-gamepad.initGamepad(io);
+uiGamepad.initGamepad(io);
 
 // Joystick Input
-joystick.initJoystick(io, screen);
+uiJoystick.initJoystick(io, mouse, screen);
 
 // Audio Output
-audio.initAudio(io);
+uiAudio.initAudio(io);
 
 // Keyboard Input
 var keyboard = new KeyBoard(io);
 keyboard.create(document.querySelector('#keyboard'));
+
+apple2.run();
 
 function loadMetaData(url, drive) {
     var label = document.querySelector('#disklabel' + drive);
@@ -51,7 +66,7 @@ function loadMetaData(url, drive) {
                 label.innerHTML = json.name;
             }
             if (json.gamepad) {
-                gamepad.updateGamepadMap(json.gamepad);
+                uiGamepad.updateGamepadMap(json.gamepad);
             }
         } catch (e) {
             debug('Bad metadata file found', url);
@@ -83,12 +98,12 @@ function loadHTTP(url, drive) {
                 if (json.blocks) {
                     if (smartport.setDisk(drive, json)) {
                         label.innerHTML = json.name;
-                        gamepad.updateGamepadMap(json.gamepad);
+                        uiGamepad.updateGamepadMap(json.gamepad);
                     }
                 } else {
                     if (disk2.setDisk(drive, json)) {
                         label.innerHTML = json.name;
-                        gamepad.updateGamepadMap(json.gamepad);
+                        uiGamepad.updateGamepadMap(json.gamepad);
                     }
                 }
             } catch (e) {
@@ -102,12 +117,12 @@ function loadHTTP(url, drive) {
             if (req.response.byteLength >= 400 * 1024) { // 400K and up uses smartport
                 if (smartport.setBinary(drive, req.response)) {
                     label.innerHTML = name;
-                    gamepad.updateGamepadMap();
+                    uiGamepad.updateGamepadMap();
                 }
             } else {
                 if (disk2.setBinary(drive, name, ext, req.response)) {
                     label.innerHTML = name;
-                    gamepad.updateGamepadMap();
+                    uiGamepad.updateGamepadMap();
                 }
             }
         };

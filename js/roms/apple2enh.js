@@ -1,4 +1,4 @@
-function Apple2eEnhancedROM()
+function Apple2enhROM()
 {
     var rom = [
         0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -2068,4 +2068,4 @@ function Apple2eEnhancedROM()
     };
 }
 
-module.exports = Apple2eEnhancedROM;
+module.exports = Apple2enhROM;

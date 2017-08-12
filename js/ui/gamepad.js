@@ -108,9 +108,9 @@ function processGamepad(io) {
 module.exports = {
     initGamepad: function initGamepad(io) {
         if (getGamepads) {
-            setInterval(function() {
+            io.addTickListener(function() {
                 processGamepad(io);
-            }, 100);
+            });
         }
     },
 

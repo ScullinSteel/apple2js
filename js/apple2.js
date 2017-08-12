@@ -1,15 +1,16 @@
 var CPU6502 = require('cpu6502');
 var RAM = require('./ram');
-var charset = require('./charroms/apple2echar').charset;
+var charset2e = require('./charroms/apple2echar').charset;
+var charset2 = require('./charroms/apple2char').charset;
 var canvas2 = require('./canvas2');
 var canvas2e = require('./canvas2e');
 var Apple2IO = require('./apple2io');
-var SmartPort = require('./smartport');
-var DiskII = require('./disk2');
-var LanguageCard = require('./langcard');
-var RamFactor = require('./ramfactor');
+// var LanguageCard = require('./langcard');
 var MMU = require('./mmu');
-var Thunderclock = require('./thunderclock');
+var Apple2enhROM = require('./roms/apple2enh');
+var Apple2eROM = require('./roms/apple2e');
+var Apple2ROM = require('./roms/apple2');
+var Apple2plusROM = require('./roms/apple2plus');
 var Debugger = require('./debugger');
 
 var kHz = 1023;
@@ -26,10 +27,7 @@ if (typeof window !== 'undefined') {
 
 function AppleII(options) {
     var cpuDebugger;
-    var canvas = options.e ? canvas2e : canvas2;
-    var LoresPage = canvas.LoresPage;
-    var HiresPage = canvas.HiresPage;
-    var VideoModes = canvas.VideoModes;
+    var mmu;
 
     function run() {
         if (runTimer) {
@@ -49,9 +47,13 @@ function AppleII(options) {
                 step = stepMax;
             }
 
-            cpu.stepCycles(step, cpuDebugger.callback);
+            if (cpuDebugger.callback) {
+                cpu.stepCyclesDebug(step, cpuDebugger.callback);
+            } else {
+                cpu.stepCycles(step);
+            }
             vm.blit();
-            io.sampleTick();
+            io.tick();
 
             if (cpuDebugger.breakpoint) {
                 if (runTimer) {
@@ -72,7 +74,21 @@ function AppleII(options) {
         }
     }
 
-    var cpu = new CPU6502({'65C02': true});
+    var cpu = new CPU6502({'65C02': options.type == 'apple2enh'});
+
+    var canvas;
+    var charset;
+    if (options.type == 'apple2enh' || options.type == 'apple2e') {
+        charset = charset2e;
+        canvas = canvas2e;
+    } else {
+        charset = charset2;
+        canvas = canvas2;
+    }
+
+    var LoresPage = canvas.LoresPage;
+    var HiresPage = canvas.HiresPage;
+    var VideoModes = canvas.VideoModes;
 
     var lores1 = new LoresPage(1, charset);
     var lores2 = new LoresPage(2, charset);
@@ -82,22 +98,27 @@ function AppleII(options) {
     var vm = new VideoModes(lores1, hires1, lores2, hires2);
     var io = new Apple2IO(cpu, vm);
 
-    var ramfactor = new RamFactor(io, 2, 1024 * 1024);
-    var smartport = new SmartPort(io, 5, cpu);
-    var disk2 = new DiskII(io, 6);
-    var thunderclock = new Thunderclock(io, 7);
+    var rom;
 
-    var mmu;
-
-    if (options.e) {
-        mmu = new MMU(cpu, vm, lores1, lores2, hires1, hires2, io, options.rom);
+    if (options.type == 'apple2enh' || options.type == 'apple2e') {
+        if (options.type == 'apple2enh') {
+            rom = new Apple2enhROM();
+        } else {
+            rom = new Apple2eROM();
+        }
+        mmu = new MMU(cpu, vm, lores1, lores2, hires1, hires2, io, rom);
 
         cpu.addPageHandler(mmu);
     } else {
+        if (options.type == 'apple2plus') {
+            rom = new Apple2plusROM();
+        } else {
+            rom = new Apple2ROM();
+        }
         var ram1 = new RAM(0x00, 0x04);
         var ram2 = new RAM(0x0C, 0x1F);
         var ram3 = new RAM(0x60, 0xBF);
-        var lc = new LanguageCard(io, 0, options.rom);
+        //var lc = new LanguageCard(io, rom);
 
         cpu.addPageHandler(ram1);
         cpu.addPageHandler(lores1);
@@ -107,13 +128,8 @@ function AppleII(options) {
         cpu.addPageHandler(hires2);
         cpu.addPageHandler(ram3);
         cpu.addPageHandler(io);
-        cpu.addPageHandler(lc);
+        cpu.addPageHandler(rom);
     }
-
-    io.setSlot(2, ramfactor);
-    io.setSlot(5, smartport);
-    io.setSlot(6, disk2);
-    io.setSlot(7, thunderclock);
 
     var screen = options.screenCanvas;
     var context = screen.getContext('2d');
@@ -121,23 +137,18 @@ function AppleII(options) {
     vm.setContext(context);
 
     cpuDebugger = new Debugger(cpu);
-    cpu.reset();
-    run();
+
+    if (options.type != 'apple2') {
+        cpu.reset();
+    }
 
     return {
         run: function() {
+            run();
         },
 
         getCPU: function () {
             return cpu;
-        },
-
-        getDiskII: function getDiskII() {
-            return disk2;
-        },
-
-        getSmartPort: function getSmartPort() {
-            return smartport;
         },
 
         getIO: function getIO() {
