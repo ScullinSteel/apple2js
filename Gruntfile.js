@@ -127,7 +127,6 @@ module.exports = function(grunt) {
         'lint',
         'sass',
         'webpack',
-        'uglify',
         'copy'
     ]);
 
