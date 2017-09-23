@@ -1,5 +1,7 @@
 var debugLib = require('debug');
 var debug = debugLib('apple2js:main');
+var extend = require('lodash/extend');
+var Util = require('./util');
 
 var AppleII = require('./apple2');
 var uiAudio = require('./ui/audio');
@@ -12,15 +14,50 @@ var Mouse = require('./cards/mouse');
 var RamFactor = require('./cards/ramfactor');
 var SmartPort = require('./cards/smartport');
 var Thunderclock = require('./cards/thunderclock');
+var Videoterm = require('./cards/videoterm');
+
+var Apple2enhROM = require('./roms/apple2enh');
+var Apple2eROM = require('./roms/apple2e');
+var Apple2ROM = require('./roms/apple2');
+var Apple2plusROM = require('./roms/apple2plus');
+
+var charset2e = require('./charroms/apple2echar').charset;
+var charset2enh = require('./charroms/apple2echar').charset;
+var charset2 = require('./charroms/apple2char').charset;
+
+var TYPES = {
+    apple2: {
+        charset: charset2,
+        ROM: Apple2ROM
+    },
+    apple2plus: {
+        charset: charset2,
+        ROM: Apple2plusROM
+    },
+    apple2e: {
+        charset: charset2e,
+        e: true,
+        ROM: Apple2eROM
+    },
+    apple2enh: {
+        charset: charset2enh,
+        e: true,
+        c: true,
+        ROM: Apple2enhROM
+    }
+};
 
 window.debugLib = debugLib;
 
 var screen = document.querySelector('#screen');
 
-var apple2 = new AppleII({
-    type: 'apple2enh',
-    screenCanvas: screen
-});
+var type = Util.gup(window.location, 'type') || 'apple2enh';
+var options = extend({}, TYPES[type]);
+
+options.rom = new options.ROM();
+options.screen = screen;
+
+var apple2 = new AppleII(options);
 
 var cpu = window.cpu = apple2.getCPU();
 
@@ -30,9 +67,16 @@ var mouse = new Mouse(cpu);
 var smartport = new SmartPort(cpu);
 var disk2 = new DiskII();
 var thunderclock = new Thunderclock();
+
+var videx = null;
+if (!options.e) {
+    videx = new Videoterm(screen.getContext('2d'));
+}
+
 var dbg = apple2.getDebugger();
 
 io.setSlot(2, ramfactor);
+if (videx) { io.setSlot(3, videx); }
 io.setSlot(4, mouse);
 io.setSlot(5, smartport);
 io.setSlot(6, disk2);
@@ -48,7 +92,7 @@ uiJoystick.initJoystick(io, mouse, screen);
 uiAudio.initAudio(io);
 
 // Keyboard Input
-var keyboard = new KeyBoard(io);
+var keyboard = new KeyBoard(cpu, io, type.e);
 keyboard.create(document.querySelector('#keyboard'));
 
 apple2.run();
@@ -58,18 +102,20 @@ function loadMetaData(url, drive) {
     var req = new XMLHttpRequest();
     req.open('GET', url, true);
 
-    req.onload = function() {
+    req.onload = function(progressEvent) {
         var json;
-        try {
-            json = JSON.parse(req.responseText);
-            if (json.name) {
-                label.innerHTML = json.name;
+        if (progressEvent.target.status === 202) {
+            try {
+                json = JSON.parse(req.responseText);
+                if (json.name) {
+                    label.innerHTML = json.name;
+                }
+                if (json.gamepad) {
+                    uiGamepad.updateGamepadMap(json.gamepad);
+                }
+            } catch (e) {
+                debug('Bad metadata file found', url);
             }
-            if (json.gamepad) {
-                uiGamepad.updateGamepadMap(json.gamepad);
-            }
-        } catch (e) {
-            debug('Bad metadata file found', url);
         }
     };
 
@@ -86,7 +132,7 @@ function loadHTTP(url, drive) {
     var ext = parts[parts.length - 1].toLowerCase();
     var label = document.querySelector('#disklabel' + drive);
 
-    debug('Loading' + url + 'into drive' + drive);
+    debug('Loading', url, 'into drive', drive);
     var req = new XMLHttpRequest();
     req.open('GET', url, true);
 

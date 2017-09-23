@@ -32,11 +32,13 @@ function Apple2IO(cpu, callbacks)
     var _buffer = [];
     var _key = 0;
     var _keyDown = false;
+    var _annunciators = [false, false, false, false];
     var _button = [false, false, false];
     var _paddle = [0.0, 0.0, 0.0, 0,0];
     var _phase = -1;
     var _sample = [];
     var _sampleTime = 0;
+    var _didAudio = false;
 
     var _high = 0.5;
     var _low = -0.5;
@@ -104,7 +106,7 @@ function Apple2IO(cpu, callbacks)
         for (; _sampleTime < now; _sampleTime += _cycles_per_sample) {
             _sample.push(phase);
             if (_sample.length >= _sample_size) {
-                emitter.emit('available', _sample);
+                emitter.emit('available', _didAudio ? _sample : []);
                 _sample = [];
             }
         }
@@ -206,24 +208,28 @@ function Apple2IO(cpu, callbacks)
             break;
         case LOC.SETAN0:
             debug('Annunciator 0 on');
+            _annunciators[0] = true;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(0, true);
             }
             break;
         case LOC.SETAN1:
             debug('Annunciator 1 on');
+            _annunciators[1] = true;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(1, true);
             }
             break;
         case LOC.SETAN2:
             debug('Annunciator 2 on');
+            _annunciators[2] = true;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(2, true);
             }
             break;
         case LOC.SETAN3:
             debug('Annunciator 3 on');
+            _annunciators[3] = true;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(3, true);
             }
@@ -233,24 +239,28 @@ function Apple2IO(cpu, callbacks)
             break;
         case LOC.CLRAN0:
             debug('Annunciator 0 off');
+            _annunciators[0] = false;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(0, false);
             }
             break;
         case LOC.CLRAN1:
             debug('Annunciator 1 off');
+            _annunciators[1] = false;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(1, false);
             }
             break;
         case LOC.CLRAN2:
             debug('Annunciator 2 off');
+            _annunciators[2] = false;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(2, false);
             }
             break;
         case LOC.CLRAN3:
             debug('Annunciator 3 off');
+            _annunciators[3] = false;
             if ('annunciator' in callbacks) {
                 callbacks.annunicator(3, false);
             }
@@ -260,6 +270,7 @@ function Apple2IO(cpu, callbacks)
             break;
         case LOC.SPEAKER:
             _phase = -_phase;
+            _didAudio = true;
             _tick();
             break;
         case LOC.STROBE:
@@ -456,6 +467,10 @@ function Apple2IO(cpu, callbacks)
         getState: function apple2io_getState() { return {}; },
         setState: function apple2io_setState() { },
 
+        getSlot: function apple2io_getSlot(slot) {
+            return _slot[slot];
+        },
+
         setSlot: function apple2io_setSlot(slot, card) {
             _slot[slot] = card;
         },
@@ -468,6 +483,10 @@ function Apple2IO(cpu, callbacks)
         keyUp: function apple2io_keyUp() {
             _keyDown = false;
             _key = 0;
+        },
+
+        annunciator: function apple2io_annunciator(a) {
+            return _annunciators[a];
         },
 
         buttonDown: function apple2io_buttonDown(b) {

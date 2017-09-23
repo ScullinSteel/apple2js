@@ -20,12 +20,11 @@ var base64_encode = Base64.encode;
  * Text Page 1 Drawing
  */
 
+var multiScreen = false;
 var textMode = true;
 var mixedMode = true;
 var hiresMode = false;
 var pageMode = 1;
-var pages = [];
-var context = null;
 var scanlines = false;
 
 /****************************************************************************
@@ -34,7 +33,7 @@ var scanlines = false;
  *
  ***************************************************************************/
 
-function LoresPage(page, charset)
+function LoresPage(page, charset, context)
 {
     'use strict';
 
@@ -44,6 +43,7 @@ function LoresPage(page, charset)
 
     var _page = page;
     var _buffer = [];
+    var _imageData;
     var _refreshing = false;
     var _greenMode = false;
     var _blink = false;
@@ -72,11 +72,12 @@ function LoresPage(page, charset)
     ];
 
     function _init() {
-        _buffer = allocMemPages(0x4);
-
-        for (var idx = 0; idx < 0x400; idx++) {
-            _buffer[idx] = 0;
+        var idx;
+        _imageData = context.createImageData(560, 384);
+        for (idx = 0; idx < 560 * 384 * 4; idx++) {
+            _imageData.data[idx] = 0xff;
         }
+        _buffer = allocMemPages(0x4);
     }
 
     function _drawPixel(data, off, color) {
@@ -151,7 +152,7 @@ function LoresPage(page, charset)
                     return;
                 }
 
-                var data = pages[_page].data, fore, back;
+                var data = _imageData.data, fore, back;
                 off = (col * 14 + row * 560 * 8 * 2) * 4;
 
                 if (textMode || (mixedMode && row > 19)) {
@@ -230,8 +231,12 @@ function LoresPage(page, charset)
             _greenMode = on;
             this.refresh();
         },
-        blit: function() {
-            context.putImageData(pages[_page], 0, 0);
+        blit: function(mixed) {
+            if (mixed) {
+                context.putImageData(_imageData, 0, 0, 0, 320, 560, 64);
+            } else {
+                context.putImageData(_imageData, 0, 0, 0, 0, 560, 384);
+            }
         },
         getState: function() {
             return {
@@ -250,7 +255,7 @@ function LoresPage(page, charset)
     };
 }
 
-function HiresPage(page)
+function HiresPage(page, context)
 {
     var _page = page;
 
@@ -262,17 +267,20 @@ function HiresPage(page)
     var blackCol = [0x00, 0x00, 0x00];
 
     var _buffer = [];
+    var _imageData;
     var _refreshing = false;
 
     var _green = [0x00, 0xff, 0x80];
     var _greenMode = false;
 
     function _init() {
-        _buffer = allocMemPages(0x20);
-
-        for (var idx = 0; idx < 0x2000; idx++) {
-            _buffer[idx] = 0; // Math.floor(Math.random()*256);
+        var idx;
+        _imageData = context.createImageData(560, 384);
+        for (idx = 0; idx < 560 * 384 * 4; idx++) {
+            _imageData.data[idx] = 0xff;
         }
+
+        _buffer = allocMemPages(0x20);
     }
 
     function _drawPixel(data, off, color) {
@@ -332,7 +340,7 @@ function HiresPage(page)
                     return;
                 }
 
-                var data = pages[_page].data,
+                var data = _imageData.data,
                     dy = rowa * 8 + rowb,
                     dx = col * 14 - 2,
                     b0 = col > 0 ? _buffer[base - 1] : 0,
@@ -392,8 +400,12 @@ function HiresPage(page)
             _greenMode = on;
             this.refresh();
         },
-        blit: function() {
-            context.putImageData(pages[_page], 0, 0);
+        blit: function(mixed) {
+            if (mixed) {
+                context.putImageData(_imageData, 0, 0, 0, 0, 560, 320);
+            } else {
+                context.putImageData(_imageData, 0, 0, 0, 0, 560, 384);
+            }
         },
         getState: function() {
             return {
@@ -423,6 +435,8 @@ function VideoModes(gr,hgr,gr2,hgr2) {
         _hgrs[1].refresh();
     }
 
+    _refresh();
+
     return {
         refresh: function() {
             _refresh();
@@ -451,21 +465,23 @@ function VideoModes(gr,hgr,gr2,hgr2) {
         page: function(pageNo) {
             pageMode = pageNo;
         },
-        setContext: function(c) {
-            context = c;
-
-            pages[1] = context.createImageData(560, 384);
-            pages[2] = context.createImageData(560, 384);
-            for (var idx = 0; idx < 560 * 384 * 4; idx++) {
-                pages[1].data[idx] = 0xff;
-                pages[2].data[idx] = 0xff;
-            }
-        },
         blit: function() {
-            if (hiresMode && !textMode) {
-                _hgrs[pageMode - 1].blit();
+            if (multiScreen) {
+                _grs[0].blit();
+                _grs[1].blit();
+                _hgrs[0].blit();
+                _hgrs[1].blit();
             } else {
-                _grs[pageMode - 1].blit();
+                if (hiresMode && !textMode) {
+                    if (mixedMode) {
+                        _grs[pageMode - 1].blit(true);
+                        _hgrs[pageMode - 1].blit(true);
+                    } else {
+                        _hgrs[pageMode - 1].blit();
+                    }
+                } else {
+                    _grs[pageMode - 1].blit();
+                }
             }
         },
         getState: function() {
