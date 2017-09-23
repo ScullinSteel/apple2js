@@ -92,7 +92,22 @@ function DiskII()
         0x1,0x3,0x5,0x7,0x9,0xb,0xd,0xf
     ];
 
-    var _trans = [
+    // var D13O = [
+    //     0x0, 0xa, 0x7, 0x4, 0x1, 0xb, 0x8, 0x5, 0x2, 0xc, 0x9, 0x6, 0x3
+    // ];
+
+    var _D13O = [
+        0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc
+    ];
+
+    var _trans53 = [
+        0xab, 0xad, 0xae, 0xaf, 0xb5, 0xb6, 0xb7, 0xba,
+        0xbb, 0xbd, 0xbe, 0xbf, 0xd6, 0xd7, 0xda, 0xdb,
+        0xdd, 0xde, 0xdf, 0xea, 0xeb, 0xed, 0xee, 0xef,
+        0xf5, 0xf6, 0xf7, 0xfa, 0xfb, 0xfd, 0xfe, 0xff
+    ];
+
+    var _trans62 = [
         0x96, 0x97, 0x9a, 0x9b, 0x9d, 0x9e, 0x9f, 0xa6,
         0xa7, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb2, 0xb3,
         0xb4, 0xb5, 0xb6, 0xb7, 0xb9, 0xba, 0xbb, 0xbc,
@@ -103,7 +118,7 @@ function DiskII()
         0xf7, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
     ];
 
-    var _detrans = [
+    var _detrans62 = [
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
@@ -145,7 +160,7 @@ function DiskII()
         return ((xx << 1) | 0x01) & yy;
     }
 
-    function _explodeSector(volume, track, sector, data) {
+    function _explodeSector16(volume, track, sector, data) {
         var checksum;
 
         var buf = [], idx;
@@ -222,10 +237,112 @@ function DiskII()
         var last = 0;
         for (idx = 0; idx < 0x156; idx++) {
             var val = nibbles[idx];
-            buf.push(_trans[last ^ val]);
+            buf.push(_trans62[last ^ val]);
             last = val;
         }
-        buf.push(_trans[last]);
+        buf.push(_trans62[last]);
+        buf = buf.concat([0xde, 0xaa, 0xf2]); // Epilog DE AA F2
+
+        /*
+         * Gap 3
+         */
+
+        buf.push(0xff);
+
+        return buf;
+    }
+
+    function _explodeSector13(volume, track, sector, data) {
+        var checksum;
+
+        var buf = [], idx;
+
+        var gap;
+
+        /*
+         * Gap 1/3 (40/0x28 bytes)
+         */
+
+        if (sector === 0) // Gap 1
+            gap = 0x80;
+        else { // Gap 3
+            gap = track === 0 ? 0x28 : 0x26;
+        }
+
+        for (idx = 0; idx < gap; idx++) {
+            buf.push(0xff);
+        }
+
+        /*
+         * Address Field
+         */
+
+        checksum  = volume ^ track ^ sector;
+        buf = buf.concat([0xd5, 0xaa, 0xb5]); // Address Prolog D5 AA B5
+        buf = buf.concat(_fourXfour(volume));
+        buf = buf.concat(_fourXfour(track));
+        buf = buf.concat(_fourXfour(sector));
+        buf = buf.concat(_fourXfour(checksum));
+        buf = buf.concat([0xde, 0xaa, 0xeb]); // Epilog DE AA EB
+
+        /*
+         * Gap 2 (5 bytes)
+         */
+
+        for (idx = 0; idx < 0x05; idx++) {
+            buf.push(0xff);
+        }
+
+        /*
+         * Data Field
+         */
+
+        buf = buf.concat([0xd5, 0xaa, 0xad]); // Data Prolog D5 AA AD
+
+        var nibbles = [];
+
+        var jdx = 0;
+        for (idx = 0x32; idx >= 0; idx--) {
+            var a5 = data[jdx] >> 3;
+            var a3 = data[jdx] & 0x07;
+            jdx++;
+            var b5 = data[jdx] >> 3;
+            var b3 = data[jdx] & 0x07;
+            jdx++;
+            var c5 = data[jdx] >> 3;
+            var c3 = data[jdx] & 0x07;
+            jdx++;
+            var d5 = data[jdx] >> 3;
+            var d3 = data[jdx] & 0x07;
+            jdx++;
+            var e5 = data[jdx] >> 3;
+            var e3 = data[jdx] & 0x07;
+            jdx++;
+            nibbles[idx + 0x00] = a5;
+            nibbles[idx + 0x33] = b5;
+            nibbles[idx + 0x66] = c5;
+            nibbles[idx + 0x99] = d5;
+            nibbles[idx + 0xcc] = e5;
+            nibbles[idx + 0x100] = a3 << 2 | (d3 & 0x4) >> 1 | (e3 & 0x4) >> 2;
+            nibbles[idx + 0x133] = b3 << 2 | (d3 & 0x2)      | (e3 & 0x2) >> 1;
+            nibbles[idx + 0x166] = c3 << 2 | (d3 & 0x1) << 1 | (e3 & 0x1);
+        }
+        nibbles[0xff] = data[jdx] >> 3;
+        nibbles[0x199] = data[jdx] & 0x07;
+
+        var val;
+        var last = 0;
+        for (idx = 0x199; idx >= 0x100; idx--) {
+            val = nibbles[idx];
+            buf.push(_trans53[last ^ val]);
+            last = val;
+        }
+        for (idx = 0x0; idx < 0x100; idx++) {
+            val = nibbles[idx];
+            buf.push(_trans53[last ^ val]);
+            last = val;
+        }
+        buf.push(_trans53[last]);
 
         buf = buf.concat([0xde, 0xaa, 0xeb]); // Epilog DE AA EB
 
@@ -275,7 +392,7 @@ function DiskII()
             for (var s = 0; s < json.data[t].length; s++) {
                 var _s = 15 - s;
                 var d = base64_decode(json.data[t][_s]);
-                track = track.concat(_explodeSector(v, t, _DO[_s], d));
+                track = track.concat(_explodeSector16(v, t, _DO[_s], d));
             }
             tracks[t] = bytify(track);
         }
@@ -284,34 +401,31 @@ function DiskII()
         _cur.tracks = tracks;
     }
 
-    function _readNext() {
-        var result = 0;
+    function _readWriteNext() {
         if (_skip || _writeMode) {
-            var t = _cur.tracks[_cur.track >> 1];
-            if (t && t.length) {
-                if (_cur.head >= t.length) {
+            var track = _cur.tracks[_cur.track >> 1];
+            if (track && track.length) {
+                if (_cur.head >= track.length) {
                     _cur.head = 0;
                 }
 
                 if (_writeMode) {
-                    t[_cur.head] = _latch;
+                    if (!_cur.readOnly) {
+                        track[_cur.head] = _latch;
+                        if (!_cur.dirty) {
+                            _updateDirty(_drive, true);
+                        }
+                    }
                 } else {
-                    result = t[_cur.head];
+                    _latch = track[_cur.head];
                 }
+
                 ++_cur.head;
             }
+        } else {
+            _latch = 0;
         }
-        _skip = (++_skip % 4);
-        return result;
-    }
-
-    function _writeNext(val) {
-        if (_writeMode) {
-            _latch = val;
-            if (!_cur.dirty) {
-                _updateDirty(_drive, true);
-            }
-        }
+        _skip = (++_skip % 2);
     }
 
     function _readSector(drive, track, sector) {
@@ -363,12 +477,12 @@ function DiskII()
                     var data2 = [];
                     var last = 0;
                     for (jdx = 0x55; jdx >= 0; jdx--)  {
-                        val = _detrans[_readNext() - 0x80] ^ last;
+                        val = _detrans62[_readNext() - 0x80] ^ last;
                         data2[jdx] = val;
                         last = val;
                     }
                     for (jdx = 0; jdx < 0x100; jdx++) {
-                        val = _detrans[_readNext() - 0x80] ^ last;
+                        val = _detrans62[_readNext() - 0x80] ^ last;
                         data[jdx] = val;
                         last = val;
                     }
@@ -430,44 +544,46 @@ function DiskII()
 
     function _access(off, val) {
         var result = 0;
+        var readMode = val === undefined;
+
         switch (off & 0x8f) {
-        case LOC.PHASE0OFF:
+        case LOC.PHASE0OFF: // 0x00
             setPhase(0, false);
             break;
-        case LOC.PHASE0ON:
+        case LOC.PHASE0ON: // 0x01
             setPhase(0, true);
             break;
-        case LOC.PHASE1OFF:
+        case LOC.PHASE1OFF: // 0x02
             setPhase(1, false);
             break;
-        case LOC.PHASE1ON:
+        case LOC.PHASE1ON: // 0x03
             setPhase(1, true);
             break;
-        case LOC.PHASE2OFF:
+        case LOC.PHASE2OFF: // 0x04
             setPhase(2, false);
             break;
-        case LOC.PHASE2ON:
+        case LOC.PHASE2ON: // 0x05
             setPhase(2, true);
             break;
-        case LOC.PHASE3OFF:
+        case LOC.PHASE3OFF: // 0x06
             setPhase(3, false);
             break;
-        case LOC.PHASE3ON:
+        case LOC.PHASE3ON:  // 0x07
             setPhase(3, true);
             break;
 
-        case LOC.DRIVEOFF:
+        case LOC.DRIVEOFF: // 0x08
             debug('Drive Off');
             _on = false;
             _emitter.emit('driveLight', _drive, _on);
             break;
-        case LOC.DRIVEON:
+        case LOC.DRIVEON: // 0x09
             debug('Drive On');
             _on = true;
             _emitter.emit('driveLight', _drive, _on);
             break;
 
-        case LOC.DRIVE1:
+        case LOC.DRIVE1:  // 0x0a
             debug('Disk 1');
             _drive = 1;
             _cur = _drives[_drive - 1];
@@ -476,7 +592,7 @@ function DiskII()
                 _emitter.emit('driveLight', 2, false);
             }
             break;
-        case LOC.DRIVE2:
+        case LOC.DRIVE2:  // 0x0b
             debug('Disk 2');
             _drive = 2;
             _cur = _drives[_drive - 1];
@@ -486,29 +602,46 @@ function DiskII()
             }
             break;
 
-        case LOC.DRIVEREAD:
-            result = _readNext();
-            // debug('read: ' + Util.toHex(result));
+        case LOC.DRIVEREAD: // 0x0c
+            _readWriteNext();
             break;
 
-        case LOC.DRIVEWRITE:
-            // debug('write: ' + Util.toHex(val));
-            if (val !== undefined) {
-                _writeNext(val);
+        case LOC.DRIVEWRITE: // 0x0d
+            if (readMode && !_writeMode) {
+                if (_cur.readOnly) {
+                    _latch = _latch | 0x80;
+                    debug('Setting readOnly');
+                } else {
+                    _latch = _latch & 0x7f;
+                    debug('Clearing readOnly');
+                }
             }
             break;
-        case LOC.DRIVEREADMODE:
+
+        case LOC.DRIVEREADMODE:  // 0x0e
             debug('Read Mode');
             _writeMode = false;
-            result = (_readNext() & 0x7f) | (_cur.readOnly ? 0x80 : 0x00);
             break;
-        case LOC.DRIVEWRITEMODE:
+        case LOC.DRIVEWRITEMODE: // 0x0f
             debug('Write Mode');
             _writeMode = true;
             break;
+
         default:
             break;
         }
+
+        if (readMode) {
+            if ((off & 0x01) === 0) {
+                result = _latch;
+                // debug('Read', toHex(result));
+            } else {
+                result = 0;
+            }
+        } else if (_writeMode) {
+            _latch = val;
+        }
+
         return result;
     }
 
@@ -671,7 +804,7 @@ function DiskII()
         setDisk: function disk2_setDisk(drive, disk) {
             var fmt = disk.type, readOnly = disk.readOnly;
 
-            var data, t, s;
+            var data, t, s, _s;
             if (disk.encoding == 'base64') {
                 data = [];
                 for (t = 0; t < disk.data.length; t++) {
@@ -703,20 +836,26 @@ function DiskII()
                 var track = [];
                 if (fmt === 'nib') {
                     track = data[t];
+                } else if (fmt === 'd13') { // DOS 3.2 Order
+                    for (s = 0; s < data[t].length; s++) {
+                        track = track.concat(
+                            _explodeSector13(v, t, _D13O[s], data[t][_D13O[s]])
+                        );
+                    }
                 } else {
                     for (s = 0; s < data[t].length; s++) {
-                        var _s = 15 - s;
+                        _s = 15 - s;
                         if (fmt === 'po') { // ProDOS Order
                             track = track.concat(
-                                _explodeSector(v, t, _PO[s], data[t][s])
+                                _explodeSector16(v, t, _PO[s], data[t][s])
                             );
-                        } else if (fmt === 'dsk') { // DOS Order
+                        } else if (fmt === 'dsk') { // DOS 3.3 Order
                             track = track.concat(
-                                _explodeSector(v, t, _DO[_s], data[t][_s])
+                                _explodeSector16(v, t, _DO[_s], data[t][_s])
                             );
                         } else { // flat
                             track = track.concat(
-                                _explodeSector(v, t, s, data[t][s])
+                                _explodeSector16(v, t, s, data[t][s])
                             );
                         }
                     }
@@ -745,7 +884,7 @@ function DiskII()
             _cur.readOnly = false;
             if (fmt === '2mg') {
                 // Standard header size is 64 bytes. Make assumptions.
-                var prefix = data.slice(0, 64);
+                var prefix = new Uint8Array(data.slice(0, 64));
                 data = data.slice(64);
 
                 // Check image format.
@@ -775,25 +914,34 @@ function DiskII()
                 }
             }
             for (var t = 0; t < 35; t++) {
-                var track, off, d;
+                var track, off, d, s, _s;
                 if (fmt === 'nib') {
                     off = t * 0x1a00;
-                    track = data.slice(off, off + 0x1a00);
+                    track = new Uint8Array(data.slice(off, off + 0x1a00));
+                } else if (fmt == 'd13') { // DOS 3.2 Order
+                    track = [];
+                    for (s = 0; s < 13; s++) {
+                        off = (13 * t + _D13O[s]) * 256;
+                        d = new Uint8Array(data.slice(off, off + 256));
+                        track = track.concat(
+                            _explodeSector13(v, t, _D13O[s], d)
+                        );
+                    }
                 } else {
                     track = [];
-                    for (var s = 0; s < 16; s++) {
-                        var _s = 15 - s;
+                    for (s = 0; s < 16; s++) {
+                        _s = 15 - s;
                         if (fmt == 'po') { // ProDOS Order
                             off = (16 * t + s) * 256;
                             d = new Uint8Array(data.slice(off, off + 256));
                             track = track.concat(
-                                _explodeSector(v, t, _PO[s], d)
+                                _explodeSector16(v, t, _PO[s], d)
                             );
-                        } else if (fmt == 'dsk') { // DOS Order
+                        } else if (fmt == 'dsk') { // DOS 3.3 Order
                             off = (16 * t + _s) * 256;
                             d = new Uint8Array(data.slice(off, off + 256));
                             track = track.concat(
-                                _explodeSector(v, t, _DO[_s], d)
+                                _explodeSector16(v, t, _DO[_s], d)
                             );
                         } else {
                             return false;
@@ -813,7 +961,7 @@ function DiskII()
         getBinary: function disk2_getBinary(drive) {
             var cur = _drives[drive - 1];
             var len = (16 * cur.tracks.length * 256);
-            var data = new Array(len);
+            var data = new Uint8Array(len);
             var idx = 0;
 
             for (var t = 0; t < cur.tracks.length; t++) {
