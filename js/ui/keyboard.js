@@ -13,7 +13,7 @@ var Util = require('../util');
 var debug = require('debug')('apple2js:keyboard');
 var toHex = Util.toHex;
 
-function KeyBoard(io) {
+function KeyBoard(cpu, io, e) {
     // keycode: [plain, cntl, shift]
     var keymap = {
         // Most of these won't happen
@@ -155,7 +155,19 @@ function KeyBoard(io) {
         0xFF: [0xFF, 0xFF, 0xFF] // No comma line
     };
 
-    var keys = [[
+    var keys2 =
+        [[['1','2','3','4','5','6','7','8','9','0',':','-','reset'],
+          ['ESC','Q','W','E','R','T','Y','U','I','O','P','rept','return'],
+          ['ctrl','A','S','D','F','G','H','J','K','L',';','&larr;','&rarr;'],
+          ['shift','Z','X','C','V','B','N','M',',','.','/','shift'],
+          ['power', '&nbsp;']],
+        [['!','"','#','$','%','&','\'','(',')','0','*','=','reset'],
+          ['ESC','Q','W','E','R','T','Y','U','I','O','@','rept','return'],
+          ['ctrl','A','S','D','F','BELL','H','J','K','L','+','&larr;','&rarr;'],
+          ['shift','Z','X','C','V','B','^',']','<','>','?','shift'],
+          ['power', '&nbsp;']]];
+
+    var keys2e = [[
         ['esc','1','2','3','4','5','6','7','8','9','0','-','=','delete'],
         ['tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
         ['ctrl','A','S','D','F','G','H','J','K','L',';','\'','return'],
@@ -168,6 +180,8 @@ function KeyBoard(io) {
         ['shift','Z','X','C','V','B','N','M','<','>','?','shift'],
         ['caps','~','pow','open-apple','&nbsp;','closed-apple','&larr;','&rarr;','&darr;','&uarr;']
     ]];
+
+    var keys = e ? keys2e : keys2;
 
     var shifted = false;
     var controlled = false;
@@ -223,10 +237,14 @@ function KeyBoard(io) {
             commanded = down;
             if (down) {
                 io.buttonDown(0);
-                commandKey.classList.add('active');
+                if (commandKey) {
+                    commandKey.classList.add('active');
+                }
             } else {
                 io.buttonUp(0);
-                commandKey.classList.remove('active');
+                if (commandKey) {
+                    commandKey.classList.remove('active');
+                }
             }
         },
 
@@ -234,10 +252,14 @@ function KeyBoard(io) {
             optioned = down;
             if (down) {
                 io.buttonDown(1);
-                optionKey.classList.add('active');
+                if (optionKey) {
+                    optionKey.classList.add('active');
+                }
             } else {
                 io.buttonUp(1);
-                optionKey.classList.remove('active');
+                if (optionKey) {
+                    optionKey.classList.remove('active');
+                }
             }
         },
 
@@ -253,6 +275,9 @@ function KeyBoard(io) {
         create: function keyboard_create(keyboard) {
             var x, y, row, key, key1, key2, label, label1, label2, self = this;
 
+            if (e) {
+                keyboard.classList.add('apple2e');
+            }
             keyboard.classList.add('noselect');
 
             function buildLabel(k) {
@@ -323,6 +348,9 @@ function KeyBoard(io) {
                             window.location.reload();
                         }
                         break;
+                    case 'reset':
+                        cpu.reset();
+                        break;
                     case 'open-apple':
                         self.commandKey(!commanded);
                         break;
@@ -335,7 +363,7 @@ function KeyBoard(io) {
                 } else {
                     if (controlled && key >= '@' && key <= '_') {
                         io.keyDown(key.charCodeAt(0) - 0x40);
-                    } else if (!shifted && !capslocked &&
+                    } else if (!e && !shifted && !capslocked &&
                                key >= 'A' && key <= 'Z') {
                         io.keyDown(key.charCodeAt(0) + 0x20);
                     } else {

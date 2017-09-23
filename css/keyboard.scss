@@ -1,6 +1,7 @@
 @import './colors';
 
 $power-key-back: #ffd;
+$power-key-back-pressed: #cca;
 $power-key-green: #4f4;
 
 $key-back: #44372c;
@@ -53,17 +54,9 @@ $keyboard-font: sans-serif;
     vertical-align: bottom;
     width: 32px;
 
-    &.active {
-      color: $key-active;
-    }
-
-    &.pressed {
-      background-color: $key-back-pressed;
-      border: 5px outset $key-border-pressed;
-    }
-
     div {
       bottom: 1px;
+      position: absolute;
       width: 100%;
 
       span {
@@ -74,6 +67,21 @@ $keyboard-font: sans-serif;
         }
       }
     }
+
+    &.vcenter {
+      div {
+        bottom: 10px;
+      }
+    }
+
+    &.active {
+      color: $key-active;
+    }
+  }
+
+  .pressed {
+    background-color: $key-back-pressed;
+    border: 5px outset $key-border-pressed;
   }
 
   .key-shift {
@@ -103,6 +111,11 @@ $keyboard-font: sans-serif;
     div {
       bottom: 15px;
     }
+
+    &.pressed {
+      background-color: $power-key-back-pressed;
+      border: 2px groove $black;
+    }
   }
 
   .key-nbsp {
@@ -127,10 +140,8 @@ $keyboard-font: sans-serif;
       }
     }
   }
-}
 
-.apple2e {
-  #keyboard {
+  &.apple2e {
     margin: 0;
 
     .row {
@@ -161,10 +172,6 @@ $keyboard-font: sans-serif;
     }
 
     .vcenter {
-      div {
-        bottom: 10px;
-      }
-
       &.key-open-apple {
         div {
           bottom: 1px;
