@@ -20,6 +20,7 @@ var toHex = Util.toHex;
 var base64_decode = Base64.decode;
 
 function SmartPort(cpu) {
+    'use strict';
 
     /*
         $Cn01=$20

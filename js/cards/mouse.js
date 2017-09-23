@@ -13,6 +13,7 @@ var debug = require('debug')('apple2js:mouse');
 var Util = require('../util');
 
 function Mouse(cpu) {
+    'use strict';
 
     // $Cn05 = $38
     // $Cn07 = $18
