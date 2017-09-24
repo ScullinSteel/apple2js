@@ -1,7 +1,6 @@
 var CPU6502 = require('cpu6502');
 var RAM = require('./ram');
-var canvas2 = require('./canvas2');
-var canvas2e = require('./canvas2e');
+var canvas = require('./canvas');
 var Apple2IO = require('./apple2io');
 
 var LanguageCard = require('./cards/langcard');
@@ -81,23 +80,16 @@ function AppleII(options) {
 
     var cpu = new CPU6502({'65C02': options.c});
 
-    var canvas;
-    if (options.e) {
-        canvas = canvas2e;
-    } else {
-        canvas = canvas2;
-    }
-
     var LoresPage = canvas.LoresPage;
     var HiresPage = canvas.HiresPage;
     var VideoModes = canvas.VideoModes;
 
-    var lores1 = new LoresPage(1, options.charset, context);
-    var lores2 = new LoresPage(2, options.charset, context);
+    var lores1 = new LoresPage(1, options.charset, options.e, context);
+    var lores2 = new LoresPage(2, options.charset, options.e, context);
     var hires1 = new HiresPage(1, context);
     var hires2 = new HiresPage(2, context);
 
-    var vm = new VideoModes(lores1, hires1, lores2, hires2);
+    var vm = new VideoModes(lores1, hires1, lores2, hires2, options.e);
     var io = new Apple2IO(cpu, vm);
 
     if (options.e) {
