@@ -4,7 +4,7 @@ var extend = require('lodash/extend');
 var Util = require('./util');
 
 var AppleII = require('./apple2');
-var uiAudio = require('./ui/audio');
+var Audio = require('./ui/audio');
 var uiGamepad = require('./ui/gamepad');
 var uiJoystick = require('./ui/joystick');
 var KeyBoard = require('./ui/keyboard');
@@ -89,7 +89,7 @@ uiGamepad.initGamepad(io);
 uiJoystick.initJoystick(io, mouse, screen);
 
 // Audio Output
-uiAudio.initAudio(io);
+new Audio(io);
 
 // Keyboard Input
 var keyboard = new KeyBoard(cpu, io, type.e);

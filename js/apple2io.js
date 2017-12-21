@@ -108,6 +108,7 @@ function Apple2IO(cpu, callbacks)
             if (_sample.length >= _sample_size) {
                 emitter.emit('available', _didAudio ? _sample : []);
                 _sample = [];
+                _didAudio = false;
             }
         }
     }
